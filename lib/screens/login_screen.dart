@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:duochat/screens/home_screen_container.dart';
 import 'package:duochat/screens/onboarding_screen.dart';
@@ -51,8 +53,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (documents.length == 0) {
       // Update data to server if new user
       Firestore.instance.collection('users').document(user.uid).setData({
-        'nickname': user.displayName,
-        'photoUrl': user.photoUrl,
+        'name': user.displayName,
+        'photoURL': user.photoUrl,
         'id': user.uid,
         'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
         'finishedOnboarding': false,
@@ -163,11 +165,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       Buttons.Facebook,
                       onPressed: () => handleSignInWithFacebook(context),
                     ),
-                    SizedBox(height: 8.0),
-                    SignInButton(
-                      Buttons.Apple,
-                      onPressed: () => handleSignInWithApple(context),
-                    ),
+                    if (Platform.isIOS) ...[
+                      SizedBox(height: 8.0),
+                      SignInButton(
+                        Buttons.Apple,
+                        onPressed: () => handleSignInWithApple(context),
+                      ),
+                    ]
                   ],
                 ),
               ),

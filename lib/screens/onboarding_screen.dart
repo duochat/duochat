@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:duochat/screens/home_screen_container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static String id = 'onboarding_screen';
@@ -11,37 +12,11 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  final _auth = FirebaseAuth.instance;
-
-  String messageText;
-
-  final _firestore = Firestore.instance;
-  FirebaseUser firebaseUser;
-
-  @override
-  void initState() {
-    super.initState();
-
-    getCurrentUser();
-  }
-
-  void getCurrentUser() async {
-    try {
-      final user = await _auth.currentUser();
-      if (user != null) {
-        firebaseUser = user;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  void handleFinishedOnboarding() {
-    Firestore.instance
-        .collection('users')
-        .document(firebaseUser.uid)
-        .updateData({
+  void handleFinishedOnboarding(BuildContext context) {
+    FirebaseUser user = Provider.of<FirebaseUser>(context, listen: false);
+    Firestore.instance.collection('users').document(user.uid).updateData({
       'finishedOnboarding': true,
+      'username': user.uid,
     });
     Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
   }
@@ -51,7 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return SafeArea(
       child: Center(
         child: RaisedButton(
-          onPressed: handleFinishedOnboarding,
+          onPressed: () => handleFinishedOnboarding(context),
           child: Text('Finish Onboarding'),
         ),
       ),
