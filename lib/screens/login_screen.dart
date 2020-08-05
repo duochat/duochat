@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:duochat/screens/home_screen.dart';
+import 'package:duochat/screens/home_screen_container.dart';
 import 'package:duochat/screens/onboarding_screen.dart';
 import 'package:duochat/widget/loading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,6 +20,62 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+
+    getCurrentUser();
+  }
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser();
+      if (user != null) {
+        setState(() {
+          isLoading = true;
+        });
+        _handleFirebaseUser(user);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _handleFirebaseUser(FirebaseUser user) async {
+    // Check is already sign up
+    final QuerySnapshot result = await Firestore.instance
+        .collection('users')
+        .where('id', isEqualTo: user.uid)
+        .getDocuments();
+    final List<DocumentSnapshot> documents = result.documents;
+    if (documents.length == 0) {
+      // Update data to server if new user
+      Firestore.instance.collection('users').document(user.uid).setData({
+        'nickname': user.displayName,
+        'photoUrl': user.photoUrl,
+        'id': user.uid,
+        'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+        'finishedOnboarding': false,
+      });
+
+      this.setState(() {
+        isLoading = false;
+      });
+
+      Navigator.pushReplacementNamed(context, OnboardingScreen.id);
+    } else {
+      this.setState(() {
+        isLoading = false;
+      });
+
+      if (documents[0].data['finishedOnboarding']) {
+        Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
+      } else {
+        Navigator.pushReplacementNamed(context, OnboardingScreen.id);
+      }
+    }
+  }
+
   Future<Null> handleSignInWithGoogle(BuildContext context) async {
     this.setState(() {
       isLoading = true;
@@ -34,52 +90,16 @@ class _LoginScreenState extends State<LoginScreen> {
         idToken: googleAuth.idToken,
       );
 
-      print(credential);
-
       FirebaseUser firebaseUser =
           (await _auth.signInWithCredential(credential)).user;
 
       if (firebaseUser != null) {
-        // Check is already sign up
-        final QuerySnapshot result = await Firestore.instance
-            .collection('users')
-            .where('id', isEqualTo: firebaseUser.uid)
-            .getDocuments();
-        final List<DocumentSnapshot> documents = result.documents;
-        if (documents.length == 0) {
-          // Update data to server if new user
-          Firestore.instance
-              .collection('users')
-              .document(firebaseUser.uid)
-              .setData({
-            'nickname': firebaseUser.displayName,
-            'photoUrl': firebaseUser.photoUrl,
-            'id': firebaseUser.uid,
-            'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-            'finishedOnboarding': false,
-          });
-
-          this.setState(() {
-            isLoading = false;
-          });
-
-          Navigator.pushNamed(context, OnboardingScreen.id);
-        } else {
-          this.setState(() {
-            isLoading = false;
-          });
-
-          if (documents[0].data['finishedOnboarding']) {
-            Navigator.pushNamed(context, HomeScreen.id);
-          } else {
-            Navigator.pushNamed(context, OnboardingScreen.id);
-          }
-        }
+        _handleFirebaseUser(firebaseUser);
       } else {
         _handleSignInFail(context, 'Google');
       }
-    } catch (Exception, stacktrace) {
-      print(stacktrace);
+    } catch (e, s) {
+      print('$e $s');
       _handleSignInFail(context, 'Google');
     }
   }

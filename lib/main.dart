@@ -1,4 +1,4 @@
-import 'package:duochat/screens/home_screen.dart';
+import 'package:duochat/screens/home_screen_container.dart';
 import 'package:duochat/screens/login_screen.dart';
 import 'package:duochat/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       routes: {
         LoginScreen.id: (context) => LoginScreen(),
         OnboardingScreen.id: (context) => OnboardingScreen(),
-        HomeScreen.id: (context) => HomeScreen(),
+        HomeScreenContainer.id: (context) => HomeScreenContainer(),
       },
     );
   }

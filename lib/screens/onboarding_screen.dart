@@ -1,10 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:duochat/screens/home_screen.dart';
+import 'package:duochat/screens/home_screen_container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-final _firestore = Firestore.instance;
-FirebaseUser firebaseUser;
 
 class OnboardingScreen extends StatefulWidget {
   static String id = 'onboarding_screen';
@@ -17,6 +14,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _auth = FirebaseAuth.instance;
 
   String messageText;
+
+  final _firestore = Firestore.instance;
+  FirebaseUser firebaseUser;
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         .updateData({
       'finishedOnboarding': true,
     });
-    Navigator.pushNamed(context, HomeScreen.id);
+    Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
   }
 
   @override
