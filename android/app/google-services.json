@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "455000185090",
+    "firebase_url": "https://duochat-app.firebaseio.com",
+    "project_id": "duochat-app",
+    "storage_bucket": "duochat-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455000185090:android:c88ca31641ea39d4478a1b",
+        "android_client_info": {
+          "package_name": "com.example.duochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "455000185090-b05qp9ho2uis3dvieho9f4gimocrnaul.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.duochat",
+            "certificate_hash": "72afb458052013ccf5b29bce78bd130faa6b0886"
+          }
+        },
+        {
+          "client_id": "455000185090-u8oq1apm7j139ddbvmaqi3p1o6hckif7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQmBZq9KFNb5h1kr0BSsHsv5d9XDaS5nY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "455000185090-u8oq1apm7j139ddbvmaqi3p1o6hckif7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
