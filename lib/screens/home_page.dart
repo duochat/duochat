@@ -12,7 +12,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Duochat'),
+        title: Text(
+          'Duochat',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Column(
         children: <Widget>[
@@ -23,7 +26,7 @@ class _HomePageState extends State<HomePage> {
             chats: <Chat>[
               Chat(
                 name: 'Ian Chen',
-                id: 'uniqueid',
+                id: 'ianchenchatid',
                 photoURL: null,
                 messages: <ChatMessage>[
                   ChatMessage(

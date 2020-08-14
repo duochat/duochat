@@ -8,12 +8,12 @@ class DatabaseService {
   final Firestore _db = Firestore.instance;
 
   /// Get a stream of a single document
-  Stream<UserData> streamUserData(String id) {
+  Stream<PublicUserData> streamPublicUserData(String id) {
     return _db
-        .collection('users')
+        .collection('publicUserInfo')
         .document(id)
         .snapshots()
-        .map((snap) => UserData.fromMap(snap.data));
+        .map((snap) => PublicUserData.fromMap(snap.data));
   }
 
 //  /// Query a subcollection

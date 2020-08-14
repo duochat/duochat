@@ -45,17 +45,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleFirebaseUser(FirebaseUser user) async {
     // Check is already sign up
-    final QuerySnapshot result = await Firestore.instance
-        .collection('users')
-        .where('id', isEqualTo: user.uid)
-        .getDocuments();
-    final List<DocumentSnapshot> documents = result.documents;
-    if (documents.length == 0) {
+    final DocumentSnapshot result = await Firestore.instance
+        .collection('privateUserInfo')
+        .document(user.uid)
+        .get();
+    if (!result.exists) {
       // Update data to server if new user
-      Firestore.instance.collection('users').document(user.uid).setData({
+      Firestore.instance
+          .collection('publicUserInfo')
+          .document(user.uid)
+          .setData({
         'name': user.displayName,
+        'username': user.displayName,
         'photoURL': user.photoUrl,
         'id': user.uid,
+      });
+      Firestore.instance
+          .collection('privateUserInfo')
+          .document(user.uid)
+          .setData({
         'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
         'finishedOnboarding': false,
       });
@@ -70,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
 
-      if (documents[0].data['finishedOnboarding']) {
+      if (result.data['finishedOnboarding']) {
         Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
       } else {
         Navigator.pushReplacementNamed(context, OnboardingScreen.id);

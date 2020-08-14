@@ -1,11 +1,13 @@
 import 'package:duochat/db.dart';
-import 'package:duochat/screens/edit_profile_screen.dart';
 import 'package:duochat/screens/login_screen.dart';
+import 'package:duochat/widget/floating_bottom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../models.dart';
+import 'edit_profile_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -23,10 +25,10 @@ class _ProfilePageState extends State<ProfilePage> {
       return Container();
     }
 
-    return StreamBuilder<UserData>(
-      stream: db.streamUserData(firebaseUser.uid),
+    return StreamBuilder<PublicUserData>(
+      stream: db.streamPublicUserData(firebaseUser.uid),
       builder: (context, snapshot) {
-        UserData data = snapshot.data;
+        PublicUserData data = snapshot.data;
         if (data == null) return Container();
 
         return Scaffold(
@@ -39,8 +41,25 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Image(
-                        image: NetworkImage(data.photoURL),
+                      Stack(
+                        children: <Widget>[
+                          QrImage(
+                            data: data.username,
+                            version: QrVersions.auto,
+                            errorCorrectionLevel: QrErrorCorrectLevel.H,
+                            size: 200,
+                            gapless: true,
+                          ),
+                          Positioned.fill(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: CircleAvatar(
+                                radius: 30.0,
+                                backgroundImage: NetworkImage(data.photoURL),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                       SizedBox(height: 20.0),
                       Text(
@@ -68,41 +87,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.all(30.0),
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFe3f4ff),
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blue.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 8,
-                      ),
-                      BoxShadow(
-                        color: Colors.blue.withOpacity(0.6),
-                        spreadRadius: 1,
-                        blurRadius: 1,
-                      )
-                    ],
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, EditProfileScreen.id);
-                    },
-                    child: Center(
-                      child: Text(
-                        'EDIT PROFILE',
-                        style: TextStyle(
-                          color: Colors.blueAccent,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.0,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
+                FloatingBottomButton(
+                  onTap: () {
+                    Navigator.pushNamed(context, EditProfileScreen.id);
+                  },
+                  text: 'EDIT PROFILE',
+                ),
               ],
             ),
           ),
