@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>455000185090-bovcms4dcs1rlr4jcgu83t1kfg3v06cp.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.455000185090-bovcms4dcs1rlr4jcgu83t1kfg3v06cp</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>455000185090-b05qp9ho2uis3dvieho9f4gimocrnaul.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBtrEk2pj7nKmDN1hGzI1Pf8YZoFmbAbB0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>455000185090</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.duochat</string>
+	<key>PROJECT_ID</key>
+	<string>duochat-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>duochat-app.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:455000185090:ios:7a5063a64b2bae4e478a1b</string>
+	<key>DATABASE_URL</key>
+	<string>https://duochat-app.firebaseio.com</string>
+</dict>
+</plist>

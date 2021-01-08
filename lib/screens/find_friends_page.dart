@@ -1,5 +1,9 @@
 import 'package:duochat/widget/floating_bottom_button.dart';
+import 'package:duochat/widget/user_search.dart';
+import 'package:duochat/models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:duochat/widget/top_nav_bar.dart';
 
 class FindFriendsPage extends StatefulWidget {
   @override
@@ -7,57 +11,50 @@ class FindFriendsPage extends StatefulWidget {
 }
 
 class _FindFriendsPageState extends State<FindFriendsPage> {
+	
+	UserSearch _searchDelegate = UserSearch();
+	bool _isLoading = false;
+	List<PublicUserData> _searchResults = <PublicUserData>[];
+	
   void _showSearchScreen(context) {
-//    showSearch(context: context, delegate: UserSearch());
+    //showSearch(context: context, delegate: UserSearch());
   }
 
   @override
   Widget build(BuildContext context) {
+  	//return Text('hi');
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.only(left: 12.0, right: 8.0),
-                    child: Icon(
-                      Icons.search,
-                      color: Colors.black87,
-                      size: 24.0,
-                    ),
-                  ),
-                  prefixIconConstraints: BoxConstraints(),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-                  isDense: true,
-                  hintText: 'Search',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(200.0)),
-                  ),
-                ),
-                onChanged: (text) {
-                  print('Search: $text');
-                },
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  'My Friends... show recommendations / incoming friend requests here?',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-            FloatingBottomButton(
-              onTap: () => _showSearchScreen(context),
-              text: 'ADD FRIEND',
-            ),
-          ],
-        ),
+	      child: Column(
+		      children: <Widget>[
+			      TopNavBar(
+				      image: NetworkImage('https://picsum.photos/200/200'),
+				      title: 'Find Friends',
+				      suffix: CupertinoButton(
+					      onPressed: () {
+						      print('idk what this button does');
+					      },
+					      child: Text(
+						      'idk',
+						      style: TextStyle(color: Colors.black87),
+					      ),
+				      ),
+			      ),
+			      Expanded(
+				      child: Center(
+					      child: Text(
+						      'My Friends... show recommendations / incoming friend requests here?',
+						      textAlign: TextAlign.center,
+					      ),
+				      ),
+			      ),
+	          FloatingBottomButton(
+					    onTap: () => showSearch(context: context, delegate: _searchDelegate),
+					    text: 'FIND FRIEND',
+				    ),
+		      ],
+	      ),
       ),
     );
   }
