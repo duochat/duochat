@@ -1,6 +1,9 @@
+import 'package:duochat/widget/chat_messages.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../models.dart';
 
 class ChatScreenArguments {
   final String chatID;
@@ -19,6 +22,22 @@ class _ChatScreenState extends State<ChatScreen> {
   final FocusNode myFocusNode = FocusNode();
   final myController = TextEditingController();
 
+  final List<ChatMessage> chatMessages = <ChatMessage>[
+    ChatMessage(
+      sender: ChatMessageSender(
+        name: "Ian Chen",
+        photoURL:
+            'https://scontent-sjc3-1.xx.fbcdn.net/v/t1.0-1/p100x100/107569367_699524004113639_5166376271392046689_o.jpg?_nc_cat=102&_nc_sid=dbb9e7&_nc_ohc=Kem28j5_aiAAX91MwvD&_nc_ht=scontent-sjc3-1.xx&_nc_tp=6&oh=e8af1536be6e3299f2f20e897b4e5069&oe=5F52B67C',
+        isUser: false,
+      ),
+      text: "Ian Chen invited you to chat!",
+      timestamp: DateTime(2021, 1, 7, 17, 45),
+      readBy: [
+        ChatMessageReadByUser(name: 'Nathan Wang', id: 'asdf'),
+      ],
+    ),
+  ];
+
   @override
   void dispose() {
     // Clean up the focus node when the Form is disposed.
@@ -29,7 +48,20 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void handleChatMessageSubmit() {
-    print('Submitted ' + myController.text);
+    setState(() {
+      chatMessages.add(ChatMessage(
+        sender: ChatMessageSender(
+          name: "Ian Chen",
+          photoURL:
+              'https://scontent-sjc3-1.xx.fbcdn.net/v/t1.0-1/p100x100/107569367_699524004113639_5166376271392046689_o.jpg?_nc_cat=102&_nc_sid=dbb9e7&_nc_ohc=Kem28j5_aiAAX91MwvD&_nc_ht=scontent-sjc3-1.xx&_nc_tp=6&oh=e8af1536be6e3299f2f20e897b4e5069&oe=5F52B67C',
+          isUser: true,
+        ),
+        text: myController.text,
+        timestamp: DateTime.now(),
+        readBy: [],
+      ));
+    });
+
     myController.clear();
     myFocusNode.requestFocus();
   }
@@ -71,9 +103,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
-            Text(args.chatID),
             Flexible(
-              child: Container(),
+              child: ChatMessages(
+                messages: chatMessages,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(12.0),
