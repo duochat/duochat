@@ -29,8 +29,9 @@ class ChatMessageSender {
   final String name;
   final String photoURL;
   final String id;
+  final bool isUser;
 
-  ChatMessageSender({this.name, this.photoURL, this.id});
+  ChatMessageSender({this.name, this.photoURL, this.id, this.isUser});
 }
 
 class ChatMessageReadByUser {
