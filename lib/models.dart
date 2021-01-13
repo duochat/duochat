@@ -49,3 +49,9 @@ class ChatMessage {
 
   ChatMessage({this.sender, this.text, this.timestamp, this.readBy});
 }
+
+class ConversationPrompt {
+  final String prompt;
+
+  ConversationPrompt(this.prompt);
+}

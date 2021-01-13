@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../models.dart';
 
 class ChatMessages extends StatelessWidget {
-  final List<ChatMessage> messages;
+  final List<dynamic> messages;
 
   const ChatMessages({this.messages});
 

@@ -22,7 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final FocusNode myFocusNode = FocusNode();
   final myController = TextEditingController();
 
-  final List<ChatMessage> chatMessages = <ChatMessage>[
+  final List<dynamic> chatMessages = <dynamic>[
     ChatMessage(
       sender: ChatMessageSender(
         name: "Ian Chen",
@@ -36,6 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ChatMessageReadByUser(name: 'Nathan Wang', id: 'asdf'),
       ],
     ),
+    ConversationPrompt("What do you value most in a friendship?"),
   ];
 
   @override
