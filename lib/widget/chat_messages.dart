@@ -1,3 +1,4 @@
+import 'package:duochat/widget/conversation_prompt_message.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -13,8 +14,19 @@ class ChatMessages extends StatelessWidget {
     return ListView.builder(
       itemCount: messages.length,
       itemBuilder: (BuildContext context, int index) {
-        final ChatMessage msg = messages[index];
-        return buildChatMessage(context, msg);
+        if (messages[index] is ConversationPrompt) {
+          return ConversationPromptMessage(
+            prompt: messages[index],
+            onTap: (ConversationPrompt prompt) {
+              print("Prompt tapped: " + prompt.prompt);
+            },
+          );
+        } else if (messages[index] is ChatMessage) {
+          final ChatMessage msg = messages[index];
+          return buildChatMessage(context, msg);
+        } else {
+          throw "Unknown message " + messages[index];
+        }
       },
     );
   }
