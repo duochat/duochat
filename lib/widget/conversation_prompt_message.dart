@@ -1,4 +1,5 @@
 import 'package:duochat/models.dart';
+import 'package:duochat/screens/answer_prompt_screen.dart';
 import 'package:flutter/material.dart';
 
 class ConversationPromptMessage extends StatelessWidget {
@@ -11,7 +12,11 @@ class ConversationPromptMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        onTap(prompt);
+        Navigator.pushNamed(
+          context,
+          AnswerPromptScreen.id,
+          arguments: AnswerPromptScreenArguments(this.prompt),
+        );
       },
       child: Container(
         padding: EdgeInsets.all(20.0),

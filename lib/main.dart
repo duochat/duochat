@@ -1,3 +1,4 @@
+import 'package:duochat/screens/answer_prompt_screen.dart';
 import 'package:duochat/screens/chat_screen.dart';
 import 'package:duochat/screens/edit_profile_screen.dart';
 import 'package:duochat/screens/home_screen_container.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
           EditProfileScreen.id: (context) => EditProfileScreen(),
           ChatScreen.id: (context) => ChatScreen(),
           ScanQrScreen.id: (context) => ScanQrScreen(),
+          AnswerPromptScreen.id: (context) => AnswerPromptScreen(),
         },
       ),
     );
