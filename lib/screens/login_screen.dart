@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:duochat/screens/home_screen_container.dart';
-import 'package:duochat/screens/onboarding_screen.dart';
 import 'package:duochat/widget/loading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +71,8 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
 
-      Navigator.pushReplacementNamed(context, OnboardingScreen.id);
+      Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
+//      Navigator.pushReplacementNamed(context, OnboardingScreen.id);
     } else {
       this.setState(() {
         isLoading = false;
@@ -81,7 +81,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (result.data['finishedOnboarding']) {
         Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
       } else {
-        Navigator.pushReplacementNamed(context, OnboardingScreen.id);
+        Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
+//        Navigator.pushReplacementNamed(context, OnboardingScreen.id);
       }
     }
   }
