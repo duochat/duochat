@@ -1,4 +1,5 @@
 import 'package:duochat/models.dart';
+import 'package:duochat/screens/support_screen.dart';
 import 'package:duochat/widget/chat_list.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +23,10 @@ class _HomePageState extends State<HomePage> {
               title: 'DuoChat',
               suffix: CupertinoButton(
                 onPressed: () {
-                  print('Support??');
+                  Navigator.pushNamed(
+                    context,
+                    SupportScreen.id,
+                  );
                 },
                 child: Text(
                   'Support',

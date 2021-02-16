@@ -16,30 +16,35 @@ class TopNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
-        Container(
-          margin: EdgeInsets.all(16.0),
-          child: Container(
-            child: CircleAvatar(
-              backgroundImage: image,
-            ),
-            width: 48.0,
-            height: 48.0,
-            padding: EdgeInsets.all(3.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-          ),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8.0,
+        image != null
+            ? Container(
+                margin: EdgeInsets.all(16.0),
+                child: Container(
+                  child: CircleAvatar(
+                    backgroundImage: image,
+                  ),
+                  width: 48.0,
+                  height: 48.0,
+                  padding: EdgeInsets.all(3.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8.0,
+                    )
+                  ],
+                ),
               )
-            ],
-          ),
-        ),
+            : SizedBox(
+                width: 20.0,
+                height: 80.0,
+              ),
         Text(
           title,
           style: TextStyle(
