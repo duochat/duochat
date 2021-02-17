@@ -13,17 +13,17 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   void handleFinishedOnboarding(BuildContext context) {
-    FirebaseUser user = Provider.of<FirebaseUser>(context, listen: false);
-    Firestore.instance
+    User user = Provider.of<User>(context, listen: false);
+    FirebaseFirestore.instance
         .collection('privateUserInfo')
-        .document(user.uid)
-        .updateData({
+        .doc(user.uid)
+        .update({
       'finishedOnboarding': true,
     });
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection('publicUserInfo')
-        .document(user.uid)
-        .updateData({
+        .doc(user.uid)
+        .update({
       'username': user.uid,
     });
     Navigator.pushReplacementNamed(context, HomeScreenContainer.id);

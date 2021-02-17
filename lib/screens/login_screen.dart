@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void getCurrentUser() async {
     try {
-      final user = await _auth.currentUser();
+      final user = await _auth.currentUser;
       if (user != null) {
         setState(() {
           isLoading = true;
@@ -42,27 +42,27 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _handleFirebaseUser(FirebaseUser user) async {
+  void _handleFirebaseUser(User user) async {
     // Check is already sign up
-    final DocumentSnapshot result = await Firestore.instance
+    final DocumentSnapshot result = await FirebaseFirestore.instance
         .collection('privateUserInfo')
-        .document(user.uid)
+        .doc(user.uid)
         .get();
     if (!result.exists) {
       // Update data to server if new user
-      Firestore.instance
+      FirebaseFirestore.instance
           .collection('publicUserInfo')
-          .document(user.uid)
-          .setData({
+          .doc(user.uid)
+          .set({
         'name': user.displayName,
         'username': user.displayName,
-        'photoURL': user.photoUrl,
+        'photoURL': user.photoURL,
         'id': user.uid,
       });
-      Firestore.instance
+      FirebaseFirestore.instance
           .collection('privateUserInfo')
-          .document(user.uid)
-          .setData({
+          .doc(user.uid)
+          .set({
         'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
         'finishedOnboarding': false,
       });
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
 
-      if (result.data['finishedOnboarding']) {
+      if (result.data()['finishedOnboarding']) {
         Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
       } else {
         Navigator.pushReplacementNamed(context, HomeScreenContainer.id);
@@ -96,13 +96,12 @@ class _LoginScreenState extends State<LoginScreen> {
       GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.getCredential(
+      final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      FirebaseUser firebaseUser =
-          (await _auth.signInWithCredential(credential)).user;
+      User firebaseUser = (await _auth.signInWithCredential(credential)).user;
 
       if (firebaseUser != null) {
         _handleFirebaseUser(firebaseUser);

@@ -5,15 +5,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'models.dart';
 
 class DatabaseService {
-  final Firestore _db = Firestore.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   /// Get a stream of a single document
   Stream<PublicUserData> streamPublicUserData(String id) {
     return _db
         .collection('publicUserInfo')
-        .document(id)
+        .doc(id)
         .snapshots()
-        .map((snap) => PublicUserData.fromMap(snap.data));
+        .map((snap) => PublicUserData.fromMap(snap.data()));
   }
 
 //  /// Query a subcollection

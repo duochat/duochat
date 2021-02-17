@@ -1,6 +1,5 @@
 import 'package:duochat/db.dart';
 import 'package:duochat/screens/login_screen.dart';
-import 'package:duochat/widget/floating_bottom_button.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../models.dart';
-import 'edit_profile_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -21,7 +19,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseUser firebaseUser = Provider.of<FirebaseUser>(context);
+    User firebaseUser = Provider.of<User>(context);
 
     if (firebaseUser == null) {
       return Container();
