@@ -23,6 +23,14 @@ class Chat {
   List<ChatMessage> messages;
 
   Chat({this.name, this.id, this.photoURL, this.messages});
+  factory Chat.fromMap(Map data) {
+    return Chat(
+      name: data['name'] ?? '',
+      photoURL: data['photoURL'] ?? '',
+      id: data['id'] ?? '',
+      messages: data['messages'].map((msg) => ChatMessage.fromMap(msg)) ?? '',
+    );
+  }
 }
 
 class ChatMessageSender {
@@ -32,6 +40,14 @@ class ChatMessageSender {
   final bool isUser;
 
   ChatMessageSender({this.name, this.photoURL, this.id, this.isUser});
+  factory ChatMessageSender.fromMap(Map data) {
+    return ChatMessageSender(
+      name: data['name'] ?? '',
+      photoURL: data['photoURL'] ?? '',
+      id: data['id'] ?? '',
+      isUser: data['isUser'] ?? '',
+    );
+  }
 }
 
 class ChatMessageReadByUser {
@@ -39,6 +55,12 @@ class ChatMessageReadByUser {
   final String id;
 
   ChatMessageReadByUser({this.name, this.id});
+  factory ChatMessageReadByUser.fromMap(Map data) {
+    return ChatMessageReadByUser(
+      name: data['name'] ?? '',
+      id: data['id'] ?? '',
+    );
+  }
 }
 
 class ChatMessage {
@@ -48,6 +70,14 @@ class ChatMessage {
   final List<ChatMessageReadByUser> readBy;
 
   ChatMessage({this.sender, this.text, this.timestamp, this.readBy});
+  factory ChatMessage.fromMap(Map data) {
+    return ChatMessage(
+      sender: ChatMessageSender.fromMap(data['sender']),
+      text: data['text'] ?? '',
+      timestamp: data['timestamp'] ?? '',
+      readBy: data['readBy'].map((el) => ChatMessageReadByUser.fromMap(el)),
+    );
+  }
 }
 
 class ConversationPrompt {
