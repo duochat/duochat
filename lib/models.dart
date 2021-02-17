@@ -1,13 +1,13 @@
 
 // This is for storing the user in smaller data (in searching and friend request)
 // Doesn't have bio and stuff
-class User {
+class UserData {
   final String name;
   final String id;
   final String photoURL;
   final String username;
 
-  User({this.name, this.id, this.photoURL, this.username});
+  UserData({this.name, this.id, this.photoURL, this.username});
 }
 
 class PublicUserData {

@@ -3,7 +3,7 @@ import 'package:duochat/models.dart';
 
 class UserCard extends StatelessWidget {
 
-  final User user;
+  final UserData user;
   final String message;
   final Widget contextWidget;
   final Function onTap;
