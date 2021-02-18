@@ -34,7 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void handleChatMessageSubmit(String chatId) {
-    print("send " + myController.text);
+    print("send " + myController.text + " " + chatId);
 
     ChatMessage message = ChatMessage(
       sender: ChatMessageSender(
@@ -99,7 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Flexible(
-              child: StreamBuilder<Object>(
+              child: StreamBuilder(
                 stream: FirebaseDatabase.instance
                     .reference()
                     .child('chats')
@@ -107,8 +107,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     .child("messages")
                     .onValue,
                 builder: (context, snapshot) {
-                  print(snapshot.data);
-                  return ChatMessages(messages: []);
+                  print(snapshot.data.snapshot.value);
+                  return ChatMessages(
+                      messages: snapshot.data.snapshot.value.values
+                          .map((message) => ChatMessage.fromMap(message))
+                          .toList());
                 },
               ),
             ),
