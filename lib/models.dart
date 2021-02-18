@@ -1,13 +1,14 @@
 
 // This is for storing the user in smaller data (in searching and friend request)
 // Doesn't have bio and stuff
-class UserData {
-  final String name;
+class PrivateUserData {
   final String id;
-  final String photoURL;
-  final String username;
+  final DateTime createdTimestamp;
+  final List<String> outgoingRequests;
+  final List<String> incomingRequests;
 
-  UserData({this.name, this.id, this.photoURL, this.username});
+  PrivateUserData({this.id, this.createdTimestamp, this.outgoingRequests, this.incomingRequests});
+
 }
 
 class PublicUserData {
@@ -15,6 +16,11 @@ class PublicUserData {
   final String id;
   final String photoURL;
   final String username;
+  final String bio = "";
+  final String website = "";
+  final String profession = "";
+  final List<String> skills = [];
+  final List<String> connections = [];
 
   //TODO: add stuff like bio, website, profession...
 
