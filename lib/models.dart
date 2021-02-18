@@ -1,4 +1,3 @@
-
 // This is for storing the user in smaller data (in searching and friend request)
 // Doesn't have bio and stuff
 class UserData {
@@ -15,10 +14,11 @@ class PublicUserData {
   final String id;
   final String photoURL;
   final String username;
+  final String bio;
 
   //TODO: add stuff like bio, website, profession...
 
-  PublicUserData({this.name, this.id, this.photoURL, this.username});
+  PublicUserData({this.name, this.id, this.photoURL, this.username, this.bio});
 
   factory PublicUserData.fromMap(Map data) {
     return PublicUserData(
@@ -26,6 +26,7 @@ class PublicUserData {
       id: data['id'] ?? '',
       photoURL: data['photoURL'] ?? '',
       username: data['username'] ?? '',
+      bio: data['bio'] ?? 'my bio',
     );
   }
 }
@@ -63,12 +64,7 @@ class ChatMessageSender {
     );
   }
   toMap() {
-    return {
-      "name": name,
-      "photoURL": photoURL,
-      "id": id,
-      "isUser": isUser
-    };
+    return {"name": name, "photoURL": photoURL, "id": id, "isUser": isUser};
   }
 }
 
@@ -84,10 +80,7 @@ class ChatMessageReadByUser {
     );
   }
   toMap() {
-    return {
-      "name":name,
-      "id":id
-    };
+    return {"name": name, "id": id};
   }
 }
 
