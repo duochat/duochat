@@ -1,9 +1,8 @@
 import 'package:duochat/widget/chat_messages.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'dart:convert';
 
 import '../models.dart';
 
@@ -23,27 +22,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final FocusNode myFocusNode = FocusNode();
   final myController = TextEditingController();
-  final String chatId = "test";
   bool loading = true;
-  final List<dynamic> chatMessages = <dynamic>[];
-
-  _ChatScreenState() {
-    initListener();
-  }
-
-  void initListener() {
-    FirebaseDatabase.instance
-        .reference()
-        .child('chats')
-        .child(chatId)
-        .child("messages")
-        .onChildAdded
-        .listen((data) {
-      setState(() {
-        chatMessages.add(ChatMessage.fromMap(data.snapshot.value));
-      });
-    });
-  }
 
   @override
   void dispose() {
@@ -54,30 +33,28 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  void handleChatMessageSubmit() {
+  void handleChatMessageSubmit(String chatId) {
     print("send " + myController.text);
-    print(chatMessages);
 
     ChatMessage message = ChatMessage(
       sender: ChatMessageSender(
         name: "Ian Chen",
-        id:"dfas",
+        id: "dfas",
         photoURL:
-        'https://static.toiimg.com/thumb/msid-67586673,width-800,height-600,resizemode-75,imgsize-3918697,pt-32,y_pad-40/67586673.jpg',
+            'https://static.toiimg.com/thumb/msid-67586673,width-800,height-600,resizemode-75,imgsize-3918697,pt-32,y_pad-40/67586673.jpg',
         isUser: true,
       ),
       text: myController.text,
       timestamp: DateTime.now(),
-      readBy: [ChatMessageReadByUser(name:"dfas", id:"sadf")],
+      readBy: [ChatMessageReadByUser(name: "dfas", id: "sadf")],
     );
-    FirebaseDatabase.instance.reference()
+    FirebaseDatabase.instance
+        .reference()
         .child('chats')
         .child(chatId)
         .child("messages")
         .push()
-        .set(
-     message.toMap()
-    );
+        .set(message.toMap());
 
     myController.clear();
     myFocusNode.requestFocus();
@@ -85,10 +62,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ChatScreenArguments args = ModalRoute
-        .of(context)
-        .settings
-        .arguments;
+    final ChatScreenArguments args = ModalRoute.of(context).settings.arguments;
+    final chatId = args.chatID;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -107,9 +82,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     Icon(
                       Icons.arrow_back,
                       size: 18.0,
-                      color: Theme
-                          .of(context)
-                          .primaryColor,
+                      color: Theme.of(context).primaryColor,
                     ),
                     SizedBox(
                       width: 4.0,
@@ -118,9 +91,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       'Back',
                       style: TextStyle(
                         fontSize: 18.0,
-                        color: Theme
-                            .of(context)
-                            .primaryColor,
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                   ],
@@ -128,8 +99,17 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Flexible(
-              child: ChatMessages(
-                messages: chatMessages,
+              child: StreamBuilder<Object>(
+                stream: FirebaseDatabase.instance
+                    .reference()
+                    .child('chats')
+                    .child(chatId)
+                    .child("messages")
+                    .onValue,
+                builder: (context, snapshot) {
+                  print(snapshot.data);
+                  return ChatMessages(messages: []);
+                },
               ),
             ),
             Padding(
@@ -148,17 +128,17 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 textInputAction: TextInputAction.send,
                 onSubmitted: (result) {
-                  handleChatMessageSubmit();
+                  handleChatMessageSubmit(chatId);
                 },
                 suffix: Padding(
                   padding: EdgeInsets.only(right: 6.0),
                   child: CupertinoButton(
                     child: Icon(Icons.arrow_upward),
-                    color: Theme
-                        .of(context)
-                        .primaryColor,
+                    color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.all(Radius.circular(100.0)),
-                    onPressed: handleChatMessageSubmit,
+                    onPressed: () {
+                      handleChatMessageSubmit(chatId);
+                    },
                     padding: EdgeInsets.all(0.0),
                     minSize: 34.0,
                   ),
