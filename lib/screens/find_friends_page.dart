@@ -1,3 +1,4 @@
+import 'package:duochat/widget/connection_request_list.dart';
 import 'package:duochat/widget/floating_bottom_button.dart';
 import 'package:duochat/widget/user_search.dart';
 import 'package:duochat/models.dart';
@@ -41,14 +42,7 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 					      ),
 				      ),
 			      ),
-			      Expanded(
-				      child: Center(
-					      child: Text(
-						      'My Friends... show recommendations / incoming friend requests here?',
-						      textAlign: TextAlign.center,
-					      ),
-				      ),
-			      ),
+			      ConnectionRequestList(),
 	          FloatingBottomButton(
 					    onTap: () => showSearch(context: context, delegate: _searchDelegate),
 					    text: 'FIND FRIEND',
