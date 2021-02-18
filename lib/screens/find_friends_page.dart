@@ -3,6 +3,7 @@ import 'package:duochat/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FindFriendsPage extends StatefulWidget {
   @override
@@ -11,23 +12,24 @@ class FindFriendsPage extends StatefulWidget {
 
 class _FindFriendsPageState extends State<FindFriendsPage> {
 
-	// mock data:
-	final List<UserData> _users = [
-		UserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
-		UserData(name: 'Cat', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat'),
-		UserData(name: 'Space Planet', id: '3', photoURL: 'https://i.imgur.com/ftmga3Y.png', username: 'red_planet'),
-		UserData(name: 'Space Galaxy', id: '4', photoURL: 'https://i.imgur.com/drDF2xB.jpg', username: 'milkyway'),
-		UserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
-		UserData(name: 'Dino', id: '6', photoURL: 'https://i.imgur.com/Vaoll5X.png', username: 'Dio'),
-	];
-	final List<UserData> _requests = [
-	UserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
-	UserData(name: 'Cat with a name so long the card expands (should this be legal?) also you can\'t see the username anymore lol', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat_with_a_really_super_long_username'),
-	UserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
+	// mock data: [
+	// 		UserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
+	// 		UserData(name: 'Cat', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat'),
+	// 		UserData(name: 'Space Planet', id: '3', photoURL: 'https://i.imgur.com/ftmga3Y.png', username: 'red_planet'),
+	// 		UserData(name: 'Space Galaxy', id: '4', photoURL: 'https://i.imgur.com/drDF2xB.jpg', username: 'milkyway'),
+	// 		UserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
+	// 		UserData(name: 'Dino', id: '6', photoURL: 'https://i.imgur.com/Vaoll5X.png', username: 'Dio'),
+	// 	]
+	
+	List<PublicUserData> _users = [];
+	final List<PublicUserData> _requests = [
+	PublicUserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
+	PublicUserData(name: 'Cat with a name so long the card expands (should this be legal?) also you can\'t see the username anymore lol', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat_with_a_really_super_long_username'),
+	PublicUserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
 	];
 
 	bool _isSearching = false;
-	List<UserData> _searchResults = <UserData>[];
+	List<PublicUserData> _searchResults = <PublicUserData>[];
 
 	void _updateSearch(String keyword) {
 		setState(() {
@@ -39,15 +41,19 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 		});
 	}
 	
-  void _showSearchBar() {
+  void _showSearchBar() async {
   	print("show search bar");
+
+  	QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("publicUserInfo").get();
+		_users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+
   	setState(() {
   		_searchResults = [];
   	  _isSearching = true;
   	});
   }
 
-  void _hideSeachBar() {
+  void hideSearchBar() {
 		print("hide search bar");
   	setState(() {
 			_searchResults = [];
@@ -70,7 +76,7 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 								suffix: IconButton(
 									icon: Icon(Icons.clear),
 									tooltip: "Close",
-									onPressed: _hideSeachBar,
+									onPressed: hideSearchBar,
 								),
 							)
 						: TopNavBar(

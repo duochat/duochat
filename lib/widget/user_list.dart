@@ -4,7 +4,7 @@ import 'user_card.dart';
 
 class ConnectionRequestList extends StatelessWidget {
 
-  List<UserData> requests;
+  final List<PublicUserData> requests;
 
   ConnectionRequestList({
     Key key,
@@ -51,7 +51,7 @@ class ConnectionRequestList extends StatelessWidget {
 
 class UserSearchList extends StatelessWidget {
 
-  final List<UserData> results;
+  final List<PublicUserData> results;
 
   UserSearchList({
     Key key,
