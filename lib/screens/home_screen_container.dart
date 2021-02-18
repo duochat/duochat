@@ -12,17 +12,55 @@ class HomeScreenContainer extends StatefulWidget {
 }
 
 class _HomeScreenContainerState extends State<HomeScreenContainer> {
+  int currentPage = 0;
   final _pageController = PageController(initialPage: 1);
 
   @override
   Widget build(BuildContext context) {
-    return PageView(
-      controller: _pageController,
-      children: <Widget>[
-        ProfilePage(),
-        HomePage(),
-        FindFriendsPage(),
-      ],
+    return Scaffold(
+      body: PageView(
+          controller: _pageController,
+          children: <Widget>[
+            ProfilePage(),
+            HomePage(),
+            FindFriendsPage(),
+          ],
+          onPageChanged: (index) {
+            setState(() {
+              currentPage = index;
+            });
+          }),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentPage,
+        onTap: (index) {
+          currentPage = index;
+          _pageController.animateToPage(index,
+              duration: Duration(milliseconds: 500), curve: Curves.ease);
+        },
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.person,
+              color: currentPage == 0 ? Colors.orange : Colors.grey,
+            ),
+            label: "Profile",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.home,
+              color: currentPage == 1 ? Colors.orange : Colors.grey,
+            ),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.search,
+              color: currentPage == 2 ? Colors.orange : Colors.grey,
+            ),
+            label: "Connections",
+          ),
+        ],
+      ),
     );
   }
 }
