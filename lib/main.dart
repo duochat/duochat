@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
     return FutureBuilder(
       future: _initialization,
       builder: (context, snapshot) {
-        if (snapshot.error) {
+        if (snapshot.error != null) {
           return Text('Something went wrong');
         }
         if (snapshot.connectionState != ConnectionState.done) {
