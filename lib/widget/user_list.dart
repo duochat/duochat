@@ -4,13 +4,12 @@ import 'user_card.dart';
 
 class ConnectionRequestList extends StatelessWidget {
 
-  List<UserData> requests = [
-    UserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
-    UserData(name: 'Cat with a name so long the card expands (should this be legal?) also you can\'t see the username anymore lol', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat_with_a_really_super_long_username'),
-    UserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
-  ];
+  List<UserData> requests;
 
-
+  ConnectionRequestList({
+    Key key,
+    this.requests,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +17,6 @@ class ConnectionRequestList extends StatelessWidget {
       child: ListView.builder(
         itemCount: requests.length,
         itemBuilder: (BuildContext context, int index) {
-          final UserData chat = requests[index];
           return UserCard(
             user: requests[index],
             message: requests[index].username,
@@ -48,4 +46,35 @@ class ConnectionRequestList extends StatelessWidget {
     );
   }
 
+}
+
+
+class UserSearchList extends StatelessWidget {
+
+  final List<UserData> results;
+
+  UserSearchList({
+    Key key,
+    this.results,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: results.length,
+        itemBuilder: (BuildContext context, int index) {
+          return UserCard(
+            user: results[index],
+            message: results[index].username,
+            onTap: () {
+              //TODO show profile page
+              print("show ${results[index].username} profile page");
+            },
+          );
+        },
+      ),
+    );
+  }
+  
 }

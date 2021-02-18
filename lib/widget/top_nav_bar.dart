@@ -45,15 +45,14 @@ class TopNavBar extends StatelessWidget {
                 width: 20.0,
                 height: 80.0,
               ),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 28.0,
-            fontWeight: FontWeight.bold,
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 28.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Flexible(
-          child: Container(),
         ),
         suffix,
         SizedBox(
@@ -62,4 +61,44 @@ class TopNavBar extends StatelessWidget {
       ],
     );
   }
+}
+
+class TopSearchBar extends StatelessWidget {
+
+  final String hint;
+  final Widget suffix;
+  final Function(String value) onChanged;
+
+  const TopSearchBar({
+    Key key,
+    this.hint,
+    this.suffix,
+    this.onChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        SizedBox(
+          width: 20.0,
+          height: 80.0,
+        ),
+        Expanded(
+          child: TextField(
+            autofocus: true,
+            autocorrect: false,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: hint,
+            ),
+            onChanged: onChanged,
+          ),
+        ),
+        suffix,
+        SizedBox(width: 8.0)
+      ],
+    );
+  }
+
 }
