@@ -1,4 +1,5 @@
 import 'package:duochat/widget/chat_messages.dart';
+import 'package:duochat/widget/loading.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -107,11 +108,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     .child("messages")
                     .onValue,
                 builder: (context, snapshot) {
-                  print(snapshot.data.snapshot.value);
-                  return ChatMessages(
-                      messages: snapshot.data.snapshot.value.values
-                          .map((message) => ChatMessage.fromMap(message))
-                          .toList());
+                  if (!snapshot.hasData) return Loading();
+
+                  List<ChatMessage> messages =
+                      (snapshot.data.snapshot.value ?? {})
+                          .values
+                          .map<ChatMessage>(
+                              (message) => ChatMessage.fromMap(message))
+                          .toList();
+                  messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+                  return ChatMessages(messages: messages);
                 },
               ),
             ),
