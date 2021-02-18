@@ -8,7 +8,12 @@ class UserCard extends StatelessWidget {
   final Widget contextWidget;
   final Function onTap;
 
-  UserCard({this.user, this.message, this.contextWidget, this.onTap});
+  UserCard({
+    this.user,
+    this.message = "",
+    this.contextWidget = const SizedBox(),
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
