@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../models.dart';
+import 'edit_profile_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -94,32 +95,25 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         SizedBox(height: 8.0),
                         Text(
-                          'heyo wuts popping bio blah blah blah',
+                          data.bio,
                           style: TextStyle(
                             fontSize: 16.0,
                             color: Colors.black87,
                           ),
                         ),
-                        FlatButton(
-                          onPressed: () async {
-                            FirebaseAuth.instance.signOut();
-                            Navigator.pushReplacementNamed(
-                                context, LoginScreen.id);
-                          },
-                          child: Text('Logout'),
-                        ),
                       ],
                     ),
                   ),
-//                  FloatingBottomButton(
-//                    onTap: () {
-//                      Navigator.pushNamed(context, EditProfileScreen.id);
-//                    },
-//                    text: 'EDIT PROFILE',
-//                  ),
                 ],
               ),
             ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.pushNamed(context, EditProfileScreen.id);
+            },
+            child: Icon(Icons.edit),
+            backgroundColor: Theme.of(context).primaryColor,
           ),
         );
       },
