@@ -21,22 +21,30 @@ class ConnectionRequestList extends StatelessWidget {
             user: requests[index],
             message: requests[index].username,
             contextWidget: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                RawMaterialButton(
-                  shape: StadiumBorder(),
-                  child: Text("Accept"),
-                  fillColor: Colors.green,
-                  elevation: 0,
-                  onPressed: () { print("accepted connection request from ${requests[index].username}"); },
+                TextButton(
+                  child: Icon(Icons.check),
+                  onPressed: () => print("accepted connection request from ${requests[index].username}"),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor: Colors.orange,
+                    minimumSize: Size.fromRadius(10),
+                    padding: EdgeInsets.all(8),
+                    shape: CircleBorder(),
+                  ),
                 ),
-                RawMaterialButton(
-                  shape: StadiumBorder(),
-                  child: Text("Reject"),
-                  fillColor: Colors.red,
-                  elevation: 0,
-                  onPressed: () { print("rejected connection request from ${requests[index].username}"); },
+                OutlinedButton(
+                  child: Icon(Icons.clear),
+                  onPressed: () => print("rejected connection request from ${requests[index].username}"),
+                  style: OutlinedButton.styleFrom(
+                    primary: Colors.orange,
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: Colors.orange),
+                    minimumSize: Size.fromRadius(10),
+                    padding: EdgeInsets.all(8),
+                    shape: CircleBorder(),
+                  ),
                 ),
               ],
             ),
