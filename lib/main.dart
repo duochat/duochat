@@ -6,12 +6,14 @@ import 'package:duochat/screens/login_screen.dart';
 import 'package:duochat/screens/onboarding_screen.dart';
 import 'package:duochat/screens/scan_qr_screen.dart';
 import 'package:duochat/screens/support_screen.dart';
+import 'package:duochat/widget/loading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -24,11 +26,11 @@ class MyApp extends StatelessWidget {
     return FutureBuilder(
       future: _initialization,
       builder: (context, snapshot) {
-        if (snapshot.error) {
-          return Text('Something went wrong');
+        if (snapshot.hasError) {
+          throw "Something went wrong";
         }
         if (snapshot.connectionState != ConnectionState.done) {
-          return Text('Loading...');
+          return Loading();
         }
         return MultiProvider(
           providers: [
