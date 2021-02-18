@@ -4,28 +4,44 @@ import 'package:intl/intl.dart';
 
 import '../models.dart';
 
-class ChatMessages extends StatelessWidget {
+class ChatMessages extends StatefulWidget {
   final List<dynamic> messages;
 
   const ChatMessages({this.messages});
 
   @override
+  _ChatMessagesState createState() => _ChatMessagesState();
+}
+
+class _ChatMessagesState extends State<ChatMessages> {
+  final ScrollController _scrollController = ScrollController();
+  final _scrollMessageCt = 0;
+
+  @override
   Widget build(BuildContext context) {
+    if (_scrollMessageCt != widget.messages.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 100), curve: Curves.fastOutSlowIn);
+      });
+    }
+
     return ListView.builder(
-      itemCount: messages.length,
+      controller: _scrollController,
+      itemCount: widget.messages.length,
       itemBuilder: (BuildContext context, int index) {
-        if (messages[index] is ConversationPrompt) {
+        if (widget.messages[index] is ConversationPrompt) {
           return ConversationPromptMessage(
-            prompt: messages[index],
+            prompt: widget.messages[index],
             onTap: (ConversationPrompt prompt) {
               print("Prompt tapped: " + prompt.prompt);
             },
           );
-        } else if (messages[index] is ChatMessage) {
-          final ChatMessage msg = messages[index];
+        } else if (widget.messages[index] is ChatMessage) {
+          final ChatMessage msg = widget.messages[index];
           return buildChatMessage(context, msg);
         } else {
-          throw "Unknown message " + messages[index];
+          throw "Unknown message " + widget.messages[index];
         }
       },
     );
