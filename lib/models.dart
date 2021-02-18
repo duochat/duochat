@@ -26,7 +26,7 @@ class PublicUserData {
       id: data['id'] ?? '',
       photoURL: data['photoURL'] ?? '',
       username: data['username'] ?? '',
-      bio: data['bio'] ?? 'my bio',
+      bio: data['bio'] ?? "This user doesn't have a bio yet.",
     );
   }
 }

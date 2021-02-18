@@ -1,6 +1,7 @@
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class SupportScreen extends StatefulWidget {
   static String id = 'support_screen';
@@ -82,18 +83,16 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   void handleSubmit() async {
-    return showDialog<void>(
+    return showPlatformDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return CupertinoAlertDialog(
+        return PlatformAlertDialog(
           title: Text('Thanks for your feedback!'),
-          content: SingleChildScrollView(
-            child: Text('Our team will fix this issue as soon as possible.'),
-          ),
+          content: Text('Our team will fix this issue as soon as possible.'),
           actions: <Widget>[
-            CupertinoButton(
-              child: Text('Okay'),
+            PlatformDialogAction(
+              child: PlatformText('Okay'),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
