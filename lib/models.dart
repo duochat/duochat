@@ -62,6 +62,14 @@ class ChatMessageSender {
       isUser: data['isUser'] ?? '',
     );
   }
+  toMap() {
+    return {
+      "name": name,
+      "photoURL": photoURL,
+      "id": id,
+      "isUser": isUser
+    };
+  }
 }
 
 class ChatMessageReadByUser {
@@ -75,6 +83,12 @@ class ChatMessageReadByUser {
       id: data['id'] ?? '',
     );
   }
+  toMap() {
+    return {
+      "name":name,
+      "id":id
+    };
+  }
 }
 
 class ChatMessage {
@@ -87,10 +101,20 @@ class ChatMessage {
   factory ChatMessage.fromMap(Map data) {
     return ChatMessage(
       sender: ChatMessageSender.fromMap(data['sender']),
-      text: data['text'] ?? '',
-      timestamp: data['timestamp'] ?? '',
-      readBy: data['readBy'].map((el) => ChatMessageReadByUser.fromMap(el)),
+      text: data['text'],
+      timestamp: DateTime.fromMillisecondsSinceEpoch(data['timestamp']),
+      readBy: data['readBy']
+          .map<ChatMessageReadByUser>((el) => ChatMessageReadByUser.fromMap(el))
+          .toList(),
     );
+  }
+  toMap() {
+    return {
+      "sender": sender.toMap(),
+      "text": text,
+      "timestamp": timestamp.millisecondsSinceEpoch,
+      "readBy": readBy.map((el) => el.toMap()).toList()
+    };
   }
 }
 

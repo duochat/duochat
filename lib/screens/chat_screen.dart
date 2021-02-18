@@ -3,6 +3,7 @@ import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'dart:convert';
 
 import '../models.dart';
 
@@ -26,10 +27,18 @@ class _ChatScreenState extends State<ChatScreen> {
   bool loading = true;
   final List<dynamic> chatMessages = <dynamic>[];
 
+  _ChatScreenState() {
+    initListener();
+  }
 
   void initListener() {
-    FirebaseDatabase.instance.reference().child('chats/' + chatId).onChildAdded.listen((data) {
-      loading = false;
+    FirebaseDatabase.instance
+        .reference()
+        .child('chats')
+        .child(chatId)
+        .child("messages")
+        .onChildAdded
+        .listen((data) {
       setState(() {
         chatMessages.add(ChatMessage.fromMap(data.snapshot.value));
       });
@@ -46,22 +55,29 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void handleChatMessageSubmit() {
-    FirebaseDatabase.instance.reference().child('chats/' + chatId).onChildAdded.listen((data) {
-      setState(() {
-        chatMessages.add(ChatMessage(
-          sender: ChatMessageSender(
-            name: "Ian Chen",
-            photoURL:
-            'https://scontent-sjc3-1.xx.fbcdn.net/v/t1.0-1/p100x100/107569367_699524004113639_5166376271392046689_o.jpg?_nc_cat=102&_nc_sid=dbb9e7&_nc_ohc=Kem28j5_aiAAX91MwvD&_nc_ht=scontent-sjc3-1.xx&_nc_tp=6&oh=e8af1536be6e3299f2f20e897b4e5069&oe=5F52B67C',
-            isUser: true,
-          ),
-          text: myController.text,
-          timestamp: DateTime.now(),
-          readBy: [],
-        ));
-      });
-    });
+    print("send " + myController.text);
+    print(chatMessages);
 
+    ChatMessage message = ChatMessage(
+      sender: ChatMessageSender(
+        name: "Ian Chen",
+        id:"dfas",
+        photoURL:
+        'https://static.toiimg.com/thumb/msid-67586673,width-800,height-600,resizemode-75,imgsize-3918697,pt-32,y_pad-40/67586673.jpg',
+        isUser: true,
+      ),
+      text: myController.text,
+      timestamp: DateTime.now(),
+      readBy: [ChatMessageReadByUser(name:"dfas", id:"sadf")],
+    );
+    FirebaseDatabase.instance.reference()
+        .child('chats')
+        .child(chatId)
+        .child("messages")
+        .push()
+        .set(
+     message.toMap()
+    );
 
     myController.clear();
     myFocusNode.requestFocus();
@@ -69,7 +85,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ChatScreenArguments args = ModalRoute.of(context).settings.arguments;
+    final ChatScreenArguments args = ModalRoute
+        .of(context)
+        .settings
+        .arguments;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -88,7 +107,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     Icon(
                       Icons.arrow_back,
                       size: 18.0,
-                      color: Theme.of(context).primaryColor,
+                      color: Theme
+                          .of(context)
+                          .primaryColor,
                     ),
                     SizedBox(
                       width: 4.0,
@@ -97,7 +118,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       'Back',
                       style: TextStyle(
                         fontSize: 18.0,
-                        color: Theme.of(context).primaryColor,
+                        color: Theme
+                            .of(context)
+                            .primaryColor,
                       ),
                     ),
                   ],
@@ -131,7 +154,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   padding: EdgeInsets.only(right: 6.0),
                   child: CupertinoButton(
                     child: Icon(Icons.arrow_upward),
-                    color: Theme.of(context).primaryColor,
+                    color: Theme
+                        .of(context)
+                        .primaryColor,
                     borderRadius: BorderRadius.all(Radius.circular(100.0)),
                     onPressed: handleChatMessageSubmit,
                     padding: EdgeInsets.all(0.0),

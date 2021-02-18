@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
                       sender: ChatMessageSender(
                         name: "Ian Chen",
                         photoURL:
-                            'https://scontent-sjc3-1.xx.fbcdn.net/v/t1.0-1/p100x100/107569367_699524004113639_5166376271392046689_o.jpg?_nc_cat=102&_nc_sid=dbb9e7&_nc_ohc=Kem28j5_aiAAX91MwvD&_nc_ht=scontent-sjc3-1.xx&_nc_tp=6&oh=e8af1536be6e3299f2f20e897b4e5069&oe=5F52B67C',
+                            'https://static.toiimg.com/thumb/msid-67586673,width-800,height-600,resizemode-75,imgsize-3918697,pt-32,y_pad-40/67586673.jpg',
                       ),
                       text: "Ian Chen invited you to chat!",
                       readBy: [
