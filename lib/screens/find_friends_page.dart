@@ -30,37 +30,9 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 	// 	]
 	
 	List<PublicUserData> _users = [];
-	List<PublicUserData> _incomingRequests = [];
-	List<PublicUserData> _outgoingRequests = [];
-	List<PublicUserData> _connections = [];
 
 	bool _isSearching = false;
 	List<PublicUserData> _searchResults = [];
-
-	void initState() {
-		super.initState();
-		_updateConnections();
-	}
-
-	Future<void> _updateConnections() async {
-
-		print('refreshing connections data...');
-		User firebaseUser = Provider.of<User>(context, listen: false);
-		PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
-		PublicUserData connectionsData = await PublicUserData.fromID(firebaseUser.uid);
-			QuerySnapshot incomingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
-				.where('id', whereIn: requestsData.incomingRequests.toList()+['']).get();
-		QuerySnapshot outgoingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
-				.where('id', whereIn: requestsData.outgoingRequests.toList()+['']).get();
-		QuerySnapshot connectionsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
-				.where('id', whereIn: connectionsData.connections.toList()+['']).get();
-		setState(() {
-			_incomingRequests = incomingRequestsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
-			_outgoingRequests = outgoingRequestsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
-			_connections = connectionsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
-		});
-		print('refreshed');
-	}
 
 	void _updateSearch(String keyword) {
 		setState(() {
@@ -83,7 +55,6 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
   }
 
   void hideSearchBar() {
-		print("hide search bar");
   	setState(() {
 			_searchResults = [];
   	  _isSearching = false;
@@ -118,12 +89,7 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 			      	),
 			      _isSearching
 						? _UserSearchList(results: _searchResults)
-						: _ConnectionsList(
-							connections: _connections,
-							incomingRequests: _incomingRequests,
-							outgoingRequests: _outgoingRequests,
-							onRefresh: _updateConnections,
-						)
+						: _ConnectionsList()
 		      ],
 	      ),
       ),
@@ -131,58 +97,85 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
   }
 }
 
-class _ConnectionsList extends StatelessWidget {
+class _ConnectionsList extends StatefulWidget {
 
-	final List<PublicUserData> incomingRequests;
-	final List<PublicUserData> outgoingRequests;
-	final List<PublicUserData> connections;
-	final Function onRefresh;
+	@override
+	State<StatefulWidget> createState() => _ConnectionsListState();
+}
 
-  const _ConnectionsList({
-		Key key,
-		this.connections,
-		this.incomingRequests,
-		this.outgoingRequests,
-		this.onRefresh
-  }) : super(key: key);
+class _ConnectionsListState extends State<_ConnectionsList> {
+
+	final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+	List<PublicUserData> _incomingRequests = [];
+	List<PublicUserData> _outgoingRequests = [];
+	List<PublicUserData> _connections = [];
+
+	@override
+	void initState() {
+		super.initState();
+		Future.delayed(Duration(milliseconds: 1000), () {
+			_refreshIndicatorKey.currentState?.show();
+		});
+	}
+
+	Future<void> _updateConnections() async {
+		User firebaseUser = Provider.of<User>(context, listen: false);
+		if(firebaseUser == null) {
+			Future.delayed(Duration(milliseconds: 1000), () {
+				_refreshIndicatorKey.currentState?.show();
+			});
+		}
+		PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
+		PublicUserData connectionsData = await PublicUserData.fromID(firebaseUser.uid);
+		QuerySnapshot incomingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
+				.where('id', whereIn: requestsData.incomingRequests.toList()+['']).get();
+		QuerySnapshot outgoingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
+				.where('id', whereIn: requestsData.outgoingRequests.toList()+['']).get();
+		QuerySnapshot connectionsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
+				.where('id', whereIn: connectionsData.connections.toList()+['']).get();
+		setState(() {
+			_incomingRequests = incomingRequestsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+			_outgoingRequests = outgoingRequestsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+			_connections = connectionsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+		});
+	}
 
   int requestsRowCount() =>
-			(incomingRequests.isEmpty ? 0 : 1) + (outgoingRequests.isEmpty ? 0 : 1);
+			(_incomingRequests.isEmpty ? 0 : 1) + (_outgoingRequests.isEmpty ? 0 : 1);
 
 	@override
 	Widget build(BuildContext context) {
 		return Expanded(
 			child: RefreshIndicator(
-				onRefresh: onRefresh,
+				key: _refreshIndicatorKey,
+				onRefresh: _updateConnections,
 			  child: ListView.builder(
-			  	itemCount: connections.length + requestsRowCount(),
+			  	itemCount: _connections.length + requestsRowCount(),
 			  	itemBuilder: (BuildContext context, int index) {
-			  		if(index == 0 && incomingRequests.isNotEmpty) {
+			  		if(index == 0 && _incomingRequests.isNotEmpty) {
 			  			return UserCard(
 			  				user: PublicUserData(
-			  					photoURL: incomingRequests.first.photoURL,
-			  					name: '${incomingRequests.length} Incoming Request${incomingRequests.length>1 ? 's' : ''}',
+			  					photoURL: _incomingRequests.first.photoURL,
+			  					name: '${_incomingRequests.length} Incoming Request${_incomingRequests.length>1 ? 's' : ''}',
 			  				),
-			  				message: incomingRequests.map((user) => user.name).join(', '),
+			  				message: _incomingRequests.map((user) => user.name).join(', '),
 			  				onTap: () => Navigator.pushNamed(
-			  					context,
-			  					IncomingRequestsScreen.id,
-			  					arguments: RequestsScreenArguments(
-			  						requests: incomingRequests,
-			  						onRefresh: onRefresh,
-			  					),
-			  				),
+									context,
+									IncomingRequestsScreen.id,
+									arguments: RequestsScreenArguments(
+										onRefresh: _updateConnections,
+								)),
 			  			);
 			  		}
-			  		if((index == 0 && incomingRequests.isEmpty)
-			  			|| (index == 1 && incomingRequests.isNotEmpty)
-			  			&& outgoingRequests.isNotEmpty) {
+			  		if((index == 0 && _incomingRequests.isEmpty)
+			  			|| (index == 1 && _incomingRequests.isNotEmpty)
+			  			&& _outgoingRequests.isNotEmpty) {
 							return UserCard(
 								user: PublicUserData(
-									photoURL: outgoingRequests.first.photoURL,
-									name: '${outgoingRequests.length} Outgoing Request${outgoingRequests.length>1 ? 's' : ''}',
+									photoURL: _outgoingRequests.first.photoURL,
+									name: '${_outgoingRequests.length} Outgoing Request${_outgoingRequests.length>1 ? 's' : ''}',
 								),
-								message: outgoingRequests.map((user) => user.name).join(', '),
+								message: _outgoingRequests.map((user) => user.name).join(', '),
 								// onTap: () => Navigator.push(
 								// 		context,
 								// 		MaterialPageRoute(builder: (context) => OutgoingRequestsScreen(
@@ -194,21 +187,19 @@ class _ConnectionsList extends StatelessWidget {
 									context,
 									OutgoingRequestsScreen.id,
 									arguments: RequestsScreenArguments(
-										requests: outgoingRequests,
-										onRefresh: onRefresh,
-									),
-								),
+									onRefresh: _refreshIndicatorKey.currentState?.show,
+								)),
 							);
 			  		}
 			  		return UserCard(
-			  			user: connections[index - requestsRowCount()],
-			  			message: connections[index - requestsRowCount()].username,
+			  			user: _connections[index - requestsRowCount()],
+			  			message: _connections[index - requestsRowCount()].username,
 			  			onTap: () => Navigator.pushNamed(
 			  				context,
 			  				ProfileScreen.id,
 			  				arguments: ProfileScreenArguments(
-									user: connections[index - requestsRowCount()],
-									onRefresh: onRefresh,
+									user: _connections[index - requestsRowCount()],
+									onRefresh: _refreshIndicatorKey.currentState?.show,
 								),
 			  			),
 			  		);

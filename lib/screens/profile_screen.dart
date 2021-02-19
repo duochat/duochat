@@ -27,9 +27,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool sendingRequest = false;
   int connectionState = 0; // 0: not connected, 1: outgoing request, 2: incoming request, 3: connected
 
+  @override
   void initState() {
     super.initState();
     updateConnection();
+  }
+
+  @override
+  void dispose() {
+    if(onRefresh != null) onRefresh();
+    super.dispose();
   }
 
   Future<void> updateConnection() async {
@@ -54,6 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final ProfileScreenArguments args = ModalRoute.of(context).settings.arguments;
     user = args.user;
+    onRefresh = args.onRefresh;
 
     return Scaffold(
       backgroundColor: Colors.white,

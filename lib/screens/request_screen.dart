@@ -2,15 +2,17 @@ import 'package:duochat/db.dart';
 import 'package:duochat/models.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:duochat/widget/user_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:duochat/screens/profile_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RequestsScreenArguments {
-  final List<PublicUserData> requests;
   final Function onRefresh;
 
-  RequestsScreenArguments({this.requests, this.onRefresh});
+  RequestsScreenArguments({this.onRefresh});
 }
 
 class IncomingRequestsScreen extends StatefulWidget {
@@ -20,15 +22,43 @@ class IncomingRequestsScreen extends StatefulWidget {
 }
 class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
 
-  List<PublicUserData> requests = [];
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  List<PublicUserData> _requests = [];
   Function onRefresh;
+  
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 1000), () {
+      _refreshIndicatorKey.currentState?.show();
+    });
+  }
+  
+  @override
+  void dispose() {
+    if(onRefresh != null) onRefresh();
+    super.dispose();
+  }
+
+  Future<void> _updateRequests() async {
+    User firebaseUser = Provider.of<User>(context, listen: false);
+    if(firebaseUser == null) {
+      Future.delayed(Duration(milliseconds: 1000), () {
+        _refreshIndicatorKey.currentState?.show();
+      });
+    }
+    PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
+    QuerySnapshot incomingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
+        .where('id', whereIn: requestsData.incomingRequests.toList()+['']).get();
+    setState(() {
+      _requests = incomingRequestsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final RequestsScreenArguments args = ModalRoute.of(context).settings.arguments;
-    requests = args.requests;
     onRefresh = args.onRefresh;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -66,19 +96,20 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
               ),
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: onRefresh,
+                  key: _refreshIndicatorKey,
+                  onRefresh: _updateRequests,
                   child: ListView.builder(
-                    itemCount: requests.length,
+                    itemCount: _requests.length,
                     itemBuilder: (BuildContext context, int index) {
                       return UserCard(
-                        user: requests[index],
-                        message: requests[index].username,
+                        user: _requests[index],
+                        message: _requests[index].username,
                         onTap: () => Navigator.pushNamed(
                           context,
                           ProfileScreen.id,
                           arguments: ProfileScreenArguments(
-                            user: requests[index],
-                            onRefresh: onRefresh,
+                            user: _requests[index],
+                            onRefresh: _updateRequests,
                           ),
                         ),
                         contextWidget: Column(
@@ -87,9 +118,8 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
                             TextButton(
                               child: Icon(Icons.check),
                               onPressed: () async {
-                                print("accepted connection request from ${requests[index].username}");
-                                DatabaseService.acceptRequest(context, requests[index].id);
-                                onRefresh();
+                                await DatabaseService.acceptRequest(context, _requests[index].id);
+                                _updateRequests();
                               },
                               style: TextButton.styleFrom(
                                 minimumSize: Size.fromRadius(10),
@@ -98,10 +128,9 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
                             ),
                             OutlinedButton(
                               child: Icon(Icons.clear),
-                              onPressed: () {
-                                print("rejected connection request from ${requests[index].username}");
-                                DatabaseService.rejectRequest(context, requests[index].id);
-                                onRefresh();
+                              onPressed: () async {
+                                await DatabaseService.rejectRequest(context, _requests[index].id);
+                                _updateRequests();
                               },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: Size.fromRadius(10),
@@ -130,28 +159,44 @@ class OutgoingRequestsScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _OutgoingRequestsScreenState();
 }
 class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
-// class OutgoingRequestsScreen extends StatelessWidget {
-  // static String id = 'outgoing_requests_screen';
-  //
-  // final List<PublicUserData> requests;
-  // final Function onRefresh;
-  //
-  // const OutgoingRequestsScreen({
-  //   Key key,
-  //   this.requests,
-  //   this.onRefresh
-  // }) : super(key: key);
 
-
-  List<PublicUserData> requests;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  List<PublicUserData> _requests = [];
   Function onRefresh;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 1000), () {
+      _refreshIndicatorKey.currentState?.show();
+    });
+  }
+
+  @override
+  void dispose() {
+    if(onRefresh != null) onRefresh();
+    super.dispose();
+  }
+
+  Future<void> _updateRequests() async {
+    User firebaseUser = Provider.of<User>(context, listen: false);
+    if(firebaseUser == null) {
+      Future.delayed(Duration(milliseconds: 1000), () {
+        _refreshIndicatorKey.currentState?.show();
+      });
+    }
+    PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
+    QuerySnapshot outgoingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
+        .where('id', whereIn: requestsData.outgoingRequests.toList()+['']).get();
+    setState(() {
+      _requests = outgoingRequestsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final RequestsScreenArguments args = ModalRoute.of(context).settings.arguments;
-    requests = args.requests;
     onRefresh = args.onRefresh;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -189,27 +234,28 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
               ),
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: onRefresh,
+                  key: _refreshIndicatorKey,
+                  onRefresh: _updateRequests,
                   child: ListView.builder(
-                    itemCount: requests.length,
+                    itemCount: _requests.length,
                     itemBuilder: (BuildContext context, int index) {
                       return UserCard(
-                        user: requests[index],
-                        message: requests[index].username,
+                        user: _requests[index],
+                        message: _requests[index].username,
                         onTap: () =>
                             Navigator.pushNamed(
                               context,
                               ProfileScreen.id,
                               arguments: ProfileScreenArguments(
-                                user: requests[index],
-                                onRefresh: onRefresh,
+                                user: _requests[index],
+                                onRefresh: _updateRequests,
                               ),
                             ),
                         contextWidget: OutlinedButton(
                           child: Icon(Icons.clear),
-                          onPressed: () {
-                            DatabaseService.cancelRequest(context, requests[index].id);
-                            onRefresh();
+                          onPressed: () async {
+                            await DatabaseService.cancelRequest(context, _requests[index].id);
+                            _updateRequests();
                           },
                           style: OutlinedButton.styleFrom(
                             minimumSize: Size.fromRadius(10),
