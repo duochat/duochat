@@ -110,19 +110,17 @@ class ChatMessageSender {
   final String name;
   final String photoURL;
   final String id;
-  final bool isUser;
 
-  ChatMessageSender({this.name, this.photoURL, this.id, this.isUser});
+  ChatMessageSender({this.name, this.photoURL, this.id});
   factory ChatMessageSender.fromMap(Map data) {
     return ChatMessageSender(
       name: data['name'] ?? '',
       photoURL: data['photoURL'] ?? '',
       id: data['id'] ?? '',
-      isUser: data['isUser'] ?? '',
     );
   }
   toMap() {
-    return {"name": name, "photoURL": photoURL, "id": id, "isUser": isUser};
+    return {"name": name, "photoURL": photoURL, "id": id};
   }
 }
 

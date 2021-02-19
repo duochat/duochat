@@ -1,6 +1,7 @@
 import 'package:duochat/widget/chat_messages.dart';
 import 'package:duochat/widget/loading.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,26 +37,28 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void handleChatMessageSubmit(String chatId) {
     print("send " + myController.text + " " + chatId);
+    final String text = myController.text;
 
-    ChatMessage message = ChatMessage(
-      sender: ChatMessageSender(
-        name: "Ian Chen",
-        id: "dfas",
-        photoURL:
-            'https://static.toiimg.com/thumb/msid-67586673,width-800,height-600,resizemode-75,imgsize-3918697,pt-32,y_pad-40/67586673.jpg',
-        isUser: true,
-      ),
-      text: myController.text,
-      timestamp: DateTime.now(),
-      readBy: [ChatMessageReadByUser(name: "dfas", id: "sadf")],
-    );
-    FirebaseDatabase.instance
-        .reference()
-        .child('chats')
-        .child(chatId)
-        .child("messages")
-        .push()
-        .set(message.toMap());
+    PublicUserData.fromID(FirebaseAuth.instance.currentUser.uid)
+        .then((PublicUserData currentUser) {
+      ChatMessage message = ChatMessage(
+        sender: ChatMessageSender(
+          name: currentUser.name,
+          id: currentUser.id,
+          photoURL: currentUser.photoURL,
+        ),
+        text: text,
+        timestamp: DateTime.now(),
+        readBy: [ChatMessageReadByUser(name: "dfas", id: "sadf")],
+      );
+      FirebaseDatabase.instance
+          .reference()
+          .child('chats')
+          .child(chatId)
+          .child("messages")
+          .push()
+          .set(message.toMap());
+    });
 
     myController.clear();
     myFocusNode.requestFocus();
