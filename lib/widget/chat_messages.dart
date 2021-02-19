@@ -1,4 +1,5 @@
 import 'package:duochat/widget/conversation_prompt_message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,6 +32,7 @@ class _ChatMessagesState extends State<ChatMessages> {
       itemCount: widget.messages.length,
       itemBuilder: (BuildContext context, int index) {
         if (widget.messages[index] is ConversationPrompt) {
+          // legacy code, we don't have convo prompts anymore
           return ConversationPromptMessage(
             prompt: widget.messages[index],
             onTap: (ConversationPrompt prompt) {
@@ -48,15 +50,15 @@ class _ChatMessagesState extends State<ChatMessages> {
   }
 
   Align buildChatMessage(BuildContext context, ChatMessage msg) {
+    final String userId = FirebaseAuth.instance.currentUser.uid;
+    final bool isUser = userId == msg.sender.id;
     return Align(
-      alignment:
-          msg.sender.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
         child: Column(
-          crossAxisAlignment: msg.sender.isUser
-              ? CrossAxisAlignment.end
-              : CrossAxisAlignment.start,
+          crossAxisAlignment:
+              isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
               padding:
@@ -66,20 +68,25 @@ class _ChatMessagesState extends State<ChatMessages> {
                 style: TextStyle(color: Colors.black54),
               ),
             ),
-            Container(
-              child: Text(
-                msg.text,
-                style: TextStyle(
-                    color: msg.sender.isUser ? Colors.white : Colors.black87),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-              decoration: BoxDecoration(
-                color: msg.sender.isUser
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey[100],
-                borderRadius: BorderRadius.all(Radius.circular(100.0)),
-              ),
-            ),
+            msg.text != null
+                ? Container(
+                    child: Text(
+                      msg.text,
+                      style: TextStyle(
+                          color: isUser ? Colors.white : Colors.black87),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                    decoration: BoxDecoration(
+                      color: isUser
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[100],
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                  )
+                : Container(
+                    child: Image(image: NetworkImage(msg.imageURL)),
+                  ),
           ],
         ),
       ),
