@@ -7,37 +7,41 @@ class PrivateUserData {
   final Set<String> outgoingRequests;
   final Set<String> incomingRequests;
 
-  PrivateUserData({
-    this.id,
-    this.createdTimestamp,
-    this.finishedOnboarding,
-    this.outgoingRequests,
-    this.incomingRequests
-  });
+  PrivateUserData(
+      {this.id,
+      this.createdTimestamp,
+      this.finishedOnboarding,
+      this.outgoingRequests,
+      this.incomingRequests});
 
   static Future<PrivateUserData> fromID(String id) async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
-      .collection('privateUserInfo')
-      .doc(id).get();
+        .collection('privateUserInfo')
+        .doc(id)
+        .get();
     return PrivateUserData(
       id: id,
-      createdTimestamp: DateTime.fromMillisecondsSinceEpoch(int.parse(snapshot.data()['createdAt'])),
+      createdTimestamp: DateTime.fromMillisecondsSinceEpoch(
+          int.parse(snapshot.data()['createdAt'])),
       finishedOnboarding: snapshot.data()['finishedOnboarding'],
-      outgoingRequests: (snapshot.data()['outgoingRequests'] ?? []).map<String>((s) => s.toString()).toSet(),
-      incomingRequests: (snapshot.data()['incomingRequests'] ?? []).map<String>((s) => s.toString()).toSet(),
+      outgoingRequests: (snapshot.data()['outgoingRequests'] ?? [])
+          .map<String>((s) => s.toString())
+          .toSet(),
+      incomingRequests: (snapshot.data()['incomingRequests'] ?? [])
+          .map<String>((s) => s.toString())
+          .toSet(),
     );
   }
 
   Future<void> writeToDB() {
     return FirebaseFirestore.instance
-      .collection('privateUserInfo')
-      .doc(id)
-      .update({
-        'outgoingRequests': outgoingRequests.toList(),
-        'incomingRequests': incomingRequests.toList(),
-      });
+        .collection('privateUserInfo')
+        .doc(id)
+        .update({
+      'outgoingRequests': outgoingRequests.toList(),
+      'incomingRequests': incomingRequests.toList(),
+    });
   }
-
 }
 
 class PublicUserData {
@@ -50,7 +54,13 @@ class PublicUserData {
 
   //TODO: add stuff like bio, website, profession...
 
-  PublicUserData({this.name, this.id, this.photoURL, this.username, this.bio, this.connections});
+  PublicUserData(
+      {this.name,
+      this.id,
+      this.photoURL,
+      this.username,
+      this.bio,
+      this.connections});
 
   factory PublicUserData.fromMap(Map data) {
     return PublicUserData(
@@ -65,17 +75,18 @@ class PublicUserData {
   static Future<PublicUserData> fromID(String id) async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
         .collection('publicUserInfo')
-        .doc(id).get();
+        .doc(id)
+        .get();
     return PublicUserData(
       id: id,
       name: snapshot.data()['name'],
       photoURL: snapshot.data()['photoURL'],
       username: snapshot.data()['username'],
       bio: snapshot.data()['bio'],
-      connections: snapshot.data()['connections'] ?? [].map<String>((s) => s as String).toSet(),
+      connections: snapshot.data()['connections'] ??
+          [].map<String>((s) => s as String).toSet(),
     );
   }
-
 }
 
 class Chat {
@@ -134,14 +145,17 @@ class ChatMessageReadByUser {
 class ChatMessage {
   final ChatMessageSender sender;
   final String text;
+  final String imageURL;
   final DateTime timestamp;
   final List<ChatMessageReadByUser> readBy;
 
-  ChatMessage({this.sender, this.text, this.timestamp, this.readBy});
+  ChatMessage(
+      {this.sender, this.text, this.imageURL, this.timestamp, this.readBy});
   factory ChatMessage.fromMap(Map data) {
     return ChatMessage(
       sender: ChatMessageSender.fromMap(data['sender']),
       text: data['text'],
+      imageURL: data['imageURL'],
       timestamp: DateTime.fromMillisecondsSinceEpoch(data['timestamp']),
       readBy: data['readBy']
           .map<ChatMessageReadByUser>((el) => ChatMessageReadByUser.fromMap(el))
@@ -152,6 +166,7 @@ class ChatMessage {
     return {
       "sender": sender.toMap(),
       "text": text,
+      "imageURL": imageURL,
       "timestamp": timestamp.millisecondsSinceEpoch,
       "readBy": readBy.map((el) => el.toMap()).toList()
     };
