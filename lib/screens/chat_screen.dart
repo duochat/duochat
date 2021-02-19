@@ -140,6 +140,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 onSubmitted: (result) {
                   handleChatMessageSubmit(chatId);
                 },
+                prefix: Padding(
+                  padding: EdgeInsets.only(left: 6.0),
+                  child: CupertinoButton(
+                    child: Icon(Icons.image),
+                    color: Colors.grey.shade500,
+                    borderRadius: BorderRadius.all(Radius.circular(100.0)),
+                    onPressed: () {
+                      print("Send Image");
+                    },
+                    padding: EdgeInsets.all(0.0),
+                    minSize: 34.0,
+                  ),
+                ),
                 suffix: Padding(
                   padding: EdgeInsets.only(right: 6.0),
                   child: CupertinoButton(
