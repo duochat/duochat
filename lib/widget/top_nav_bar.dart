@@ -48,6 +48,8 @@ class TopNavBar extends StatelessWidget {
         Expanded(
           child: Text(
             title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 28.0,
               fontWeight: FontWeight.bold,

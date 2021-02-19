@@ -4,6 +4,7 @@ import 'package:duochat/screens/edit_profile_screen.dart';
 import 'package:duochat/screens/home_screen_container.dart';
 import 'package:duochat/screens/login_screen.dart';
 import 'package:duochat/screens/onboarding_screen.dart';
+import 'package:duochat/screens/profile_screen.dart';
 import 'package:duochat/screens/scan_qr_screen.dart';
 import 'package:duochat/screens/support_screen.dart';
 import 'package:duochat/widget/loading.dart';
@@ -52,6 +53,19 @@ class MyApp extends StatelessWidget {
               // is not restarted.
 //          primarySwatch: MaterialColor(0xFFFF7A00),
               primaryColor: Color(0xFFFF7A00),
+              textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(
+                primary: Colors.white,
+                backgroundColor: Colors.orange,
+                padding: EdgeInsets.all(10),
+                shape: StadiumBorder(),
+              )),
+              outlinedButtonTheme: OutlinedButtonThemeData(style: OutlinedButton.styleFrom(
+                primary: Colors.orange,
+                backgroundColor: Colors.white,
+                side: BorderSide(color: Colors.orange),
+                padding: EdgeInsets.all(10),
+                shape: StadiumBorder(),
+              ),),
               // This makes the visual density adapt to the platform that you run
               // the app on. For desktop platforms, the controls will be smaller and
               // closer together (more dense) than on mobile platforms.
@@ -67,6 +81,7 @@ class MyApp extends StatelessWidget {
               ScanQrScreen.id: (context) => ScanQrScreen(),
               AnswerPromptScreen.id: (context) => AnswerPromptScreen(),
               SupportScreen.id: (context) => SupportScreen(),
+              ProfileScreen.id: (context) => ProfileScreen(),
             },
           ),
         );

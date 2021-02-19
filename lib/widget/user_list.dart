@@ -1,6 +1,7 @@
 import 'package:duochat/models.dart';
 import 'package:flutter/material.dart';
 import 'user_card.dart';
+import 'package:duochat/screens/profile_screen.dart';
 
 class ConnectionRequestList extends StatelessWidget {
 
@@ -20,6 +21,11 @@ class ConnectionRequestList extends StatelessWidget {
           return UserCard(
             user: requests[index],
             message: requests[index].username,
+            onTap: () => Navigator.pushNamed(
+              context,
+              ProfileScreen.id,
+              arguments: ProfileScreenArguments(requests[index]),
+            ),
             contextWidget: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -27,10 +33,7 @@ class ConnectionRequestList extends StatelessWidget {
                   child: Icon(Icons.check),
                   onPressed: () => print("accepted connection request from ${requests[index].username}"),
                   style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    backgroundColor: Colors.orange,
                     minimumSize: Size.fromRadius(10),
-                    padding: EdgeInsets.all(8),
                     shape: CircleBorder(),
                   ),
                 ),
@@ -38,11 +41,7 @@ class ConnectionRequestList extends StatelessWidget {
                   child: Icon(Icons.clear),
                   onPressed: () => print("rejected connection request from ${requests[index].username}"),
                   style: OutlinedButton.styleFrom(
-                    primary: Colors.orange,
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.orange),
                     minimumSize: Size.fromRadius(10),
-                    padding: EdgeInsets.all(8),
                     shape: CircleBorder(),
                   ),
                 ),
@@ -75,10 +74,11 @@ class UserSearchList extends StatelessWidget {
           return UserCard(
             user: results[index],
             message: results[index].username,
-            onTap: () {
-              //TODO show profile page
-              print("show ${results[index].username} profile page");
-            },
+            onTap: () => Navigator.pushNamed(
+              context,
+              ProfileScreen.id,
+              arguments: ProfileScreenArguments(results[index]),
+            ),
           );
         },
       ),
