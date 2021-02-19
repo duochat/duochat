@@ -1,9 +1,11 @@
 import 'package:duochat/widget/user_list.dart';
 import 'package:duochat/models.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class FindFriendsPage extends StatefulWidget {
   @override
@@ -19,17 +21,36 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 	// 		UserData(name: 'Space Galaxy', id: '4', photoURL: 'https://i.imgur.com/drDF2xB.jpg', username: 'milkyway'),
 	// 		UserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
 	// 		UserData(name: 'Dino', id: '6', photoURL: 'https://i.imgur.com/Vaoll5X.png', username: 'Dio'),
+	// 	][
+	// 	PublicUserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
+	// 	PublicUserData(name: 'Cat with a name so long the card expands (should this be legal?) also you can\'t see the username anymore lol', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat_with_a_really_super_long_username'),
+	// 	PublicUserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
 	// 	]
 	
 	List<PublicUserData> _users = [];
-	final List<PublicUserData> _requests = [
-	PublicUserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
-	PublicUserData(name: 'Cat with a name so long the card expands (should this be legal?) also you can\'t see the username anymore lol', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat_with_a_really_super_long_username'),
-	PublicUserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
-	];
+	List<PublicUserData> _requests = [];
 
 	bool _isSearching = false;
-	List<PublicUserData> _searchResults = <PublicUserData>[];
+	List<PublicUserData> _searchResults = [];
+
+	void initState() {
+		super.initState();
+		_updateRequests();
+	}
+
+	Future<void> _updateRequests() async {
+
+		User firebaseUser = Provider.of<User>(context, listen: false);
+		PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
+		QuerySnapshot snapshot = await FirebaseFirestore.instance
+			.collection("publicUserInfo")
+			.where('id', whereIn: requestsData.incomingRequests.toList())
+			.get();
+		print('updated ${snapshot}');
+		setState(() {
+			_requests = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+		});
+	}
 
 	void _updateSearch(String keyword) {
 		setState(() {
@@ -42,8 +63,6 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 	}
 	
   void _showSearchBar() async {
-  	print("show search bar");
-
   	QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("publicUserInfo").get();
 		_users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
 
@@ -63,7 +82,6 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 
   @override
   Widget build(BuildContext context) {
-  	//return Text('hi');
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -81,7 +99,7 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 							)
 						: TopNavBar(
 								image: NetworkImage('https://picsum.photos/200/200'),
-								title: _isSearching ? '' : 'Connection Requests',
+								title: _isSearching ? '' : 'Connections',
 								suffix: IconButton(
 									icon: Icon(Icons.search),
 									tooltip: "Find new connections",
@@ -90,7 +108,10 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 			      	),
 			      _isSearching
 						? UserSearchList(results: _searchResults)
-						: ConnectionRequestList(requests: _requests),
+						: ConnectionRequestList(
+							requests: _requests,
+							onRefresh: _updateRequests,
+						),
 		      ],
 	      ),
       ),

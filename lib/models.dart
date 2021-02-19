@@ -1,12 +1,42 @@
-// This is for storing the user in smaller data (in searching and friend request)
-// Doesn't have bio and stuff
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class PrivateUserData {
   final String id;
   final DateTime createdTimestamp;
-  final List<String> outgoingRequests;
-  final List<String> incomingRequests;
+  final bool finishedOnboarding;
+  final Set<String> outgoingRequests;
+  final Set<String> incomingRequests;
 
-  PrivateUserData({this.id, this.createdTimestamp, this.outgoingRequests, this.incomingRequests});
+  PrivateUserData({
+    this.id,
+    this.createdTimestamp,
+    this.finishedOnboarding,
+    this.outgoingRequests,
+    this.incomingRequests
+  });
+
+  static Future<PrivateUserData> fromID(String id) async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+      .collection('privateUserInfo')
+      .doc(id).get();
+    return PrivateUserData(
+      id: id,
+      createdTimestamp: DateTime.fromMillisecondsSinceEpoch(int.parse(snapshot.data()['createdAt'])),
+      finishedOnboarding: snapshot.data()['finishedOnboarding'],
+      outgoingRequests: (snapshot.data()['outgoingRequests'] ?? []).map<String>((s) => s.toString()).toSet(),
+      incomingRequests: (snapshot.data()['incomingRequests'] ?? []).map<String>((s) => s.toString()).toSet(),
+    );
+  }
+
+  Future<void> writeToDB() {
+    return FirebaseFirestore.instance
+      .collection('privateUserInfo')
+      .doc(id)
+      .update({
+        'outgoingRequests': outgoingRequests.toList(),
+        'incomingRequests': incomingRequests.toList(),
+      });
+  }
 
 }
 
@@ -16,10 +46,11 @@ class PublicUserData {
   final String photoURL;
   final String username;
   final String bio;
+  final Set<String> connections;
 
   //TODO: add stuff like bio, website, profession...
 
-  PublicUserData({this.name, this.id, this.photoURL, this.username, this.bio});
+  PublicUserData({this.name, this.id, this.photoURL, this.username, this.bio, this.connections});
 
   factory PublicUserData.fromMap(Map data) {
     return PublicUserData(
@@ -30,6 +61,21 @@ class PublicUserData {
       bio: data['bio'] ?? "This user doesn't have a bio yet.",
     );
   }
+
+  static Future<PublicUserData> fromID(String id) async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('publicUserInfo')
+        .doc(id).get();
+    return PublicUserData(
+      id: id,
+      name: snapshot.data()['name'],
+      photoURL: snapshot.data()['photoURL'],
+      username: snapshot.data()['username'],
+      bio: snapshot.data()['bio'],
+      connections: snapshot.data()['connections'] ?? [].map<String>((s) => s as String).toSet(),
+    );
+  }
+
 }
 
 class Chat {
