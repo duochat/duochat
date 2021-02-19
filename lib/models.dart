@@ -50,6 +50,7 @@ class PublicUserData {
   final String photoURL;
   final String username;
   final String bio;
+  final String interests;
   final Set<String> connections;
 
   //TODO: add stuff like bio, website, profession...
@@ -60,17 +61,21 @@ class PublicUserData {
       this.photoURL,
       this.username,
       this.bio,
+      this.interests,
       this.connections});
 
   factory PublicUserData.fromMap(Map data) {
     return PublicUserData(
-      name: data['name'] ?? '',
-      id: data['id'] ?? '',
-      photoURL: data['photoURL'] ?? 'https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg',
-      username: data['username'] ?? '',
-      bio: data['bio'] ?? "This user doesn't have a bio yet.",
-      connections: (data['connections'] ?? []).map<String>((s) => s as String).toSet()
-    );
+        name: data['name'] ?? '',
+        id: data['id'] ?? '',
+        photoURL: data['photoURL'] ??
+            'https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg',
+        username: data['username'] ?? '',
+        bio: data['bio'] ?? "This user doesn't have a bio yet.",
+        interests: data['interests'] ?? "Business",
+        connections: (data['connections'] ?? [])
+            .map<String>((s) => s as String)
+            .toSet());
   }
 
   static Future<PublicUserData> fromID(String id) async {
@@ -81,10 +86,14 @@ class PublicUserData {
     return PublicUserData(
       id: id,
       name: snapshot.data()['name'] ?? 'No Name',
-      photoURL: snapshot.data()['photoURL'] ?? 'https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg',
+      photoURL: snapshot.data()['photoURL'] ??
+          'https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg',
       username: snapshot.data()['username'] ?? '_',
       bio: snapshot.data()['bio'] ?? "This user doesn't have a bio yet.",
-      connections: (snapshot.data()['connections'] ?? []).map<String>((s) => s as String).toSet(),
+      interests: snapshot.data()['interests'] ?? "Business",
+      connections: (snapshot.data()['connections'] ?? [])
+          .map<String>((s) => s as String)
+          .toSet(),
     );
   }
 
@@ -100,7 +109,6 @@ class PublicUserData {
       'connections': connections.toList(),
     });
   }
-
 }
 
 class Chat {
