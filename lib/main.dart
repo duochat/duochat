@@ -8,6 +8,7 @@ import 'package:duochat/screens/profile_screen.dart';
 import 'package:duochat/screens/scan_qr_screen.dart';
 import 'package:duochat/screens/support_screen.dart';
 import 'package:duochat/widget/loading.dart';
+import 'package:duochat/screens/request_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +83,8 @@ class MyApp extends StatelessWidget {
               AnswerPromptScreen.id: (context) => AnswerPromptScreen(),
               SupportScreen.id: (context) => SupportScreen(),
               ProfileScreen.id: (context) => ProfileScreen(),
+              IncomingRequestsScreen.id: (context) => IncomingRequestsScreen(),
+              OutgoingRequestsScreen.id: (context) => OutgoingRequestsScreen(),
             },
           ),
         );

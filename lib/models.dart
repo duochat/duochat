@@ -66,9 +66,10 @@ class PublicUserData {
     return PublicUserData(
       name: data['name'] ?? '',
       id: data['id'] ?? '',
-      photoURL: data['photoURL'] ?? '',
+      photoURL: data['photoURL'] ?? 'https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg',
       username: data['username'] ?? '',
       bio: data['bio'] ?? "This user doesn't have a bio yet.",
+      connections: (data['connections'] ?? []).map<String>((s) => s as String).toSet()
     );
   }
 
@@ -79,14 +80,27 @@ class PublicUserData {
         .get();
     return PublicUserData(
       id: id,
-      name: snapshot.data()['name'],
-      photoURL: snapshot.data()['photoURL'],
-      username: snapshot.data()['username'],
-      bio: snapshot.data()['bio'],
-      connections: snapshot.data()['connections'] ??
-          [].map<String>((s) => s as String).toSet(),
+      name: snapshot.data()['name'] ?? 'No Name',
+      photoURL: snapshot.data()['photoURL'] ?? 'https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg',
+      username: snapshot.data()['username'] ?? '_',
+      bio: snapshot.data()['bio'] ?? "This user doesn't have a bio yet.",
+      connections: (snapshot.data()['connections'] ?? []).map<String>((s) => s as String).toSet(),
     );
   }
+
+  Future<void> writeToDB() {
+    return FirebaseFirestore.instance
+        .collection('publicUserInfo')
+        .doc(id)
+        .update({
+      'name': name,
+      'photoURL': photoURL,
+      'username': username,
+      'bio': bio,
+      'connections': connections.toList(),
+    });
+  }
+
 }
 
 class Chat {

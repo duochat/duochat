@@ -1,3 +1,4 @@
+import 'package:duochat/db.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,8 +8,9 @@ import 'package:provider/provider.dart';
 
 class ProfileScreenArguments {
   final PublicUserData user;
+  final Function onRefresh;
 
-  ProfileScreenArguments(this.user);
+  ProfileScreenArguments({this.user, this.onRefresh});
 }
 
 class ProfileScreen extends StatefulWidget {
@@ -21,17 +23,17 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
 
   PublicUserData user;
+  Function onRefresh;
   bool sendingRequest = false;
   int connectionState = 0; // 0: not connected, 1: outgoing request, 2: incoming request, 3: connected
 
   void initState() {
     super.initState();
-    checkConnection();
+    updateConnection();
   }
 
-  void checkConnection() async {
+  Future<void> updateConnection() async {
     User firebaseUser = Provider.of<User>(context, listen: false);
-    print('got id');
     PublicUserData connectionsData = await PublicUserData.fromID(firebaseUser.uid);
     PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
 
@@ -46,22 +48,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         connectionState = 0;
       }
     });
-  }
-
-  void requestConnection() async {
-
-    setState(() { sendingRequest = true; });
-
-    User firebaseUser = Provider.of<User>(context, listen: false);
-    PrivateUserData sender = await PrivateUserData.fromID(firebaseUser.uid);
-    PrivateUserData receiver = await PrivateUserData.fromID(user.id);
-    sender.outgoingRequests.add(user.id);
-    receiver.incomingRequests.add(firebaseUser.uid);
-    await sender.writeToDB();
-    await receiver.writeToDB();
-
-    setState(() { sendingRequest = false; });
-    checkConnection();
   }
 
   @override
@@ -116,14 +102,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       TextButton(
                         child: Text(
                           connectionState == 0 ? 'Request Connection' :
-                          connectionState == 1 ? 'Request Sent' :
+                          connectionState == 1 ? 'Cancel Request' :
                           connectionState == 2 ? 'Accept Request' :
-                          'Connected'
+                          'Remove Connection'
                         ),
-                        onPressed:
-                          connectionState == 0 ? requestConnection :
-                          connectionState == 1 || connectionState == 3 ? null :
-                          () => print("accepted connection request from ${user.name}"),
+                        onPressed: () async {
+                          setState(() { sendingRequest = true; });
+                          if(connectionState == 0) {
+                            await DatabaseService.requestConnection(context, user.id);
+                          } else if(connectionState == 1) {
+                            await DatabaseService.cancelRequest(context, user.id);
+                          } else if(connectionState == 2) {
+                            await DatabaseService.acceptRequest(context, user.id);
+                          } else if(connectionState == 3) {
+                            await DatabaseService.removeConnection(context, user.id);
+                          }
+                          await updateConnection();
+                          setState(() { sendingRequest = false; });
+                        },
                         style: TextButton.styleFrom(
                           minimumSize: Size.fromRadius(20),
                         ),
