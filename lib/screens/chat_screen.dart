@@ -15,9 +15,9 @@ import 'package:image_picker/image_picker.dart';
 import '../models.dart';
 
 class ChatScreenArguments {
-  final String chatID;
+  final Chat chat;
 
-  ChatScreenArguments(this.chatID);
+  ChatScreenArguments(this.chat);
 }
 
 class ChatScreen extends StatefulWidget {
@@ -149,7 +149,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final ChatScreenArguments args = ModalRoute.of(context).settings.arguments;
-    final chatId = args.chatID;
+    final chatId = args.chat.id;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -157,8 +157,8 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: <Widget>[
             TopNavBar(
-              image: NetworkImage('https://picsum.photos/200'),
-              title: 'Ian Chen',
+              image: NetworkImage(args.chat.photoURL),
+              title: args.chat.name,
               suffix: CupertinoButton(
                 onPressed: () {
                   Navigator.pop(context);

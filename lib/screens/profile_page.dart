@@ -118,7 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           SizedBox(height: 12.0),
                           Text(
-                            "Interests",
+                            "Career Interests",
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,

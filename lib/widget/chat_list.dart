@@ -1,4 +1,5 @@
 import 'package:duochat/screens/chat_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
@@ -16,13 +17,12 @@ class ChatList extends StatelessWidget {
         separatorBuilder: (BuildContext context, int index) => Divider(),
         itemBuilder: (BuildContext context, int index) {
           final Chat chat = chats[index];
-          final ChatMessage lastMessage = chats[index].messages.last;
           return GestureDetector(
             onTap: () {
               Navigator.pushNamed(
                 context,
                 ChatScreen.id,
-                arguments: ChatScreenArguments(chat.id),
+                arguments: ChatScreenArguments(chat),
               );
             },
             child: Container(
@@ -43,8 +43,7 @@ class ChatList extends StatelessWidget {
                     children: <Widget>[
                       CircleAvatar(
                         radius: 30.0,
-                        backgroundImage: NetworkImage(
-                            chat.photoURL ?? lastMessage.sender.photoURL),
+                        backgroundImage: NetworkImage(chat.photoURL),
                       ),
                       SizedBox(width: 15.0),
                       Column(
@@ -63,15 +62,42 @@ class ChatList extends StatelessWidget {
                           ),
                           Container(
 //                            width: MediaQuery.of(context).size.width - 210,
-                            child: Text(
-                              lastMessage.text,
-                              style: TextStyle(
-                                color: Colors.blueGrey,
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            child: StreamBuilder<dynamic>(
+                                stream: FirebaseDatabase.instance
+                                    .reference()
+                                    .child('chats')
+                                    .child(chat.id)
+                                    .child("messages")
+                                    .onValue,
+                                builder: (context, snapshot) {
+                                  String text = "Loading...";
+
+                                  if (snapshot.hasData) {
+                                    List<ChatMessage> messages =
+                                        (snapshot.data.snapshot.value ?? {})
+                                            .values
+                                            .map<ChatMessage>((message) =>
+                                                ChatMessage.fromMap(message))
+                                            .toList();
+                                    messages.sort((a, b) =>
+                                        a.timestamp.compareTo(b.timestamp));
+                                    if (messages.isEmpty) {
+                                      text = "Say hi to " + chat.name + "!";
+                                    } else {
+                                      text = messages.last.text;
+                                    }
+                                  }
+
+                                  return Text(
+                                    text,
+                                    style: TextStyle(
+                                      color: Colors.blueGrey,
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  );
+                                }),
                           ),
                         ],
                       )

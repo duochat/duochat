@@ -144,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Builder(
         builder: (context) => Stack(
           children: <Widget>[
@@ -153,14 +153,26 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 30.0,
-                        color: Colors.white,
+                    Container(
+                      width: 240.0,
+                      child: Image(image: AssetImage('graphics/logo.png')),
+                      margin: EdgeInsets.only(top: 40.0, bottom: 20.0),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        children: <TextSpan>[
+                          TextSpan(text: 'Welcome to '),
+                          TextSpan(
+                              text: 'Duochat!',
+                              style: TextStyle(color: Colors.orange.shade600)),
+                        ],
+                        style: TextStyle(
+                          fontSize: 30.0,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     SizedBox(height: 24.0),
@@ -168,7 +180,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       Buttons.Google,
                       onPressed: () => handleSignInWithGoogle(context),
                     ),
-                    SizedBox(height: 8.0),
                     SignInButton(
                       Buttons.Facebook,
                       onPressed: () => handleSignInWithFacebook(context),
