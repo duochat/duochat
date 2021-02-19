@@ -20,17 +20,12 @@ class _ChatMessagesState extends State<ChatMessages> {
 
   @override
   Widget build(BuildContext context) {
-    if (_scrollMessageCt != widget.messages.length) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-            duration: Duration(milliseconds: 100), curve: Curves.fastOutSlowIn);
-      });
-    }
-
     return ListView.builder(
       controller: _scrollController,
+      reverse: true,
       itemCount: widget.messages.length,
-      itemBuilder: (BuildContext context, int index) {
+      itemBuilder: (BuildContext context, int reversedIndex) {
+        int index = widget.messages.length - 1 - reversedIndex;
         if (widget.messages[index] is ConversationPrompt) {
           // legacy code, we don't have convo prompts anymore
           return ConversationPromptMessage(
@@ -56,37 +51,59 @@ class _ChatMessagesState extends State<ChatMessages> {
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
-        child: Column(
-          crossAxisAlignment:
-              isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding:
-                  const EdgeInsets.only(bottom: 4.0, left: 12.0, right: 12.0),
-              child: Text(
-                DateFormat("h:mm a").format(msg.timestamp),
-                style: TextStyle(color: Colors.black54),
+        child: Row(
+          children: [
+            if (isUser)
+              Expanded(
+                flex: 2,
+                child: Container(),
+              ),
+            Expanded(
+              flex: 8,
+              child: Column(
+                crossAxisAlignment:
+                    isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        bottom: 4.0, left: 12.0, right: 12.0),
+                    child: Text(
+                      DateFormat("h:mm a").format(msg.timestamp),
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                  ),
+                  msg.text != null
+                      ? Container(
+                          child: Text(
+                            msg.text,
+                            style: TextStyle(
+                                color: isUser ? Colors.white : Colors.black87),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 12.0),
+                          decoration: BoxDecoration(
+                            color: isUser
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey[100],
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Image(
+                            image: NetworkImage(msg.imageURL),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                ],
               ),
             ),
-            msg.text != null
-                ? Container(
-                    child: Text(
-                      msg.text,
-                      style: TextStyle(
-                          color: isUser ? Colors.white : Colors.black87),
-                    ),
-                    padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-                    decoration: BoxDecoration(
-                      color: isUser
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey[100],
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                    ),
-                  )
-                : Container(
-                    child: Image(image: NetworkImage(msg.imageURL)),
-                  ),
+            if (!isUser)
+              Expanded(
+                flex: 2,
+                child: Container(),
+              ),
           ],
         ),
       ),

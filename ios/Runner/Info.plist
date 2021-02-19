@@ -54,5 +54,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Never gonna give you up</string>
+	<key>NSCameraUsageDescription</key>
+    <string>Never gonna let you down</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Never gonna run around</string>
 </dict>
 </plist>

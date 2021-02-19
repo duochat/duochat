@@ -1,10 +1,16 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:math';
+
 import 'package:duochat/widget/chat_messages.dart';
-import 'package:duochat/widget/loading.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../models.dart';
 
@@ -25,6 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final FocusNode myFocusNode = FocusNode();
   final myController = TextEditingController();
   bool loading = true;
+  PickedFile _image;
 
   @override
   void dispose() {
@@ -33,6 +40,81 @@ class _ChatScreenState extends State<ChatScreen> {
     myController.dispose();
 
     super.dispose();
+  }
+
+  Future chooseFile() async {
+    try {
+      await ImagePicker().getImage(source: ImageSource.gallery).then((image) {
+        setState(() {
+          _image = image;
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future uploadFile(chatId) async {
+    try {
+      Random rnd = new Random();
+      String ref = 'uploads/' +
+          DateTime.now().microsecondsSinceEpoch.toString() +
+          "--" +
+          rnd.nextInt(100000).toString() +
+          "--" +
+          _image.path.replaceAll("/", "_");
+      showAlertDialog(context);
+      await firebase_storage.FirebaseStorage.instance
+          .ref(ref)
+          .putFile(File(_image.path));
+      String downloadURL = await firebase_storage.FirebaseStorage.instance
+          .ref(ref)
+          .getDownloadURL();
+      PublicUserData.fromID(FirebaseAuth.instance.currentUser.uid)
+          .then((PublicUserData currentUser) {
+        ChatMessage message = ChatMessage(
+          sender: ChatMessageSender(
+            name: currentUser.name,
+            id: currentUser.id,
+            photoURL: currentUser.photoURL,
+          ),
+          imageURL: downloadURL,
+          timestamp: DateTime.now(),
+          readBy: [ChatMessageReadByUser(name: "dfas", id: "sadf")],
+        );
+        FirebaseDatabase.instance
+            .reference()
+            .child('chats')
+            .child(chatId)
+            .child("messages")
+            .push()
+            .set(message.toMap());
+        Navigator.pop(context);
+      });
+    } on firebase_core.FirebaseException catch (e) {
+      // e.g, e.code == 'canceled'
+      print(e);
+    }
+    print("uploaded");
+  }
+
+  showAlertDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: new Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(
+              margin: EdgeInsets.only(left: 16), child: Text("Uploading...")),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   void handleChatMessageSubmit(String chatId) {
@@ -111,7 +193,15 @@ class _ChatScreenState extends State<ChatScreen> {
                     .child("messages")
                     .onValue,
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) return Loading();
+                  if (!snapshot.hasData)
+                    return Container(
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    );
 
                   List<ChatMessage> messages =
                       (snapshot.data.snapshot.value ?? {})
@@ -149,8 +239,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Icon(Icons.image),
                     color: Colors.grey.shade500,
                     borderRadius: BorderRadius.all(Radius.circular(100.0)),
-                    onPressed: () {
+                    onPressed: () async {
                       print("Send Image");
+                      await chooseFile();
+                      print("chosen");
+                      await uploadFile(chatId);
+                      print("upload");
                     },
                     padding: EdgeInsets.all(0.0),
                     minSize: 34.0,
