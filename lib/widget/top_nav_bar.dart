@@ -19,19 +19,14 @@ class TopNavBar extends StatelessWidget {
         image != null
             ? Container(
                 margin: EdgeInsets.all(16.0),
-                child: Container(
-                  child: CircleAvatar(
-                    backgroundImage: image,
-                  ),
-                  width: 48.0,
-                  height: 48.0,
-                  padding: EdgeInsets.all(3.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
+                child: CircleAvatar(
+                  backgroundImage: image,
                 ),
+                width: 48.0,
+                height: 48.0,
+                padding: EdgeInsets.all(3.0),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(

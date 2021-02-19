@@ -21,10 +21,10 @@ class UserCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(top: 5.0, bottom: 5.0, right: 20.0),
-        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [const Color(0xFFFFFFEF), const Color(0xFFffd4d1)],
+            colors: [const Color(0xFFFFE0B0), const Color(0xFFFFF0D0)],
           ),
           borderRadius: BorderRadius.horizontal(
             right: Radius.circular(25.0),
@@ -34,10 +34,24 @@ class UserCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            CircleAvatar(
-              radius: 35.0,
-              backgroundImage: NetworkImage(user.photoURL),
-            ),
+            user.photoURL != null
+            ? Container(
+              child: CircleAvatar(
+                radius: 35.0,
+                backgroundImage: NetworkImage(user.photoURL),
+              ),
+              padding: EdgeInsets.all(3.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8.0,
+                  )
+                ],
+              ),
+            ) : SizedBox(width: 0),
             SizedBox(width: 10.0),
             Expanded(
               child: Column(
@@ -46,24 +60,24 @@ class UserCard extends StatelessWidget {
                   Text(
                     user.name,
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Theme.of(context).primaryColor,
                       fontSize: 15.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 5.0),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 210,
+                  message != ''
+                  ? Container(
+                    //width: MediaQuery.of(context).size.width - 210,
                     child: Text(
                       message,
                       style: TextStyle(
-                        color: Colors.blueGrey,
+                        color: Colors.black87,
                         fontSize: 15.0,
                         fontWeight: FontWeight.w600,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
+                  ) : SizedBox(height: 0),
                 ],
               ),
             ),

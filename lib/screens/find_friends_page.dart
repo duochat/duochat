@@ -106,8 +106,8 @@ class _ConnectionsList extends StatefulWidget {
 class _ConnectionsListState extends State<_ConnectionsList> {
 
 	final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-	List<PublicUserData> _incomingRequests = [];
-	List<PublicUserData> _outgoingRequests = [];
+	List<String> _incomingRequests = [];
+	List<String> _outgoingRequests = [];
 	List<PublicUserData> _connections = [];
 
 	@override
@@ -127,15 +127,11 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 		}
 		PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
 		PublicUserData connectionsData = await PublicUserData.fromID(firebaseUser.uid);
-		QuerySnapshot incomingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
-				.where('id', whereIn: requestsData.incomingRequests.toList()+['']).get();
-		QuerySnapshot outgoingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
-				.where('id', whereIn: requestsData.outgoingRequests.toList()+['']).get();
 		QuerySnapshot connectionsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
 				.where('id', whereIn: connectionsData.connections.toList()+['']).get();
 		setState(() {
-			_incomingRequests = incomingRequestsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
-			_outgoingRequests = outgoingRequestsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+			_incomingRequests = requestsData.incomingRequests.toList();
+			_outgoingRequests = requestsData.outgoingRequests.toList();
 			_connections = connectionsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
 		});
 	}
@@ -155,10 +151,9 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 			  		if(index == 0 && _incomingRequests.isNotEmpty) {
 			  			return UserCard(
 			  				user: PublicUserData(
-			  					photoURL: _incomingRequests.first.photoURL,
 			  					name: '${_incomingRequests.length} Incoming Request${_incomingRequests.length>1 ? 's' : ''}',
 			  				),
-			  				message: _incomingRequests.map((user) => user.name).join(', '),
+								contextWidget: Icon(Icons.arrow_forward_ios_rounded),
 			  				onTap: () => Navigator.pushNamed(
 									context,
 									IncomingRequestsScreen.id,
@@ -172,17 +167,9 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 			  			&& _outgoingRequests.isNotEmpty) {
 							return UserCard(
 								user: PublicUserData(
-									photoURL: _outgoingRequests.first.photoURL,
 									name: '${_outgoingRequests.length} Outgoing Request${_outgoingRequests.length>1 ? 's' : ''}',
 								),
-								message: _outgoingRequests.map((user) => user.name).join(', '),
-								// onTap: () => Navigator.push(
-								// 		context,
-								// 		MaterialPageRoute(builder: (context) => OutgoingRequestsScreen(
-								// 			requests: outgoingRequests,
-								// 			onRefresh: onRefresh,
-								// 		))
-								// ),
+								contextWidget: Icon(Icons.arrow_forward_ios_rounded),
 								onTap: () => Navigator.pushNamed(
 									context,
 									OutgoingRequestsScreen.id,

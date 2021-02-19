@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Duochat</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -57,8 +59,16 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Never gonna give you up</string>
 	<key>NSCameraUsageDescription</key>
-    <string>Never gonna let you down</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Never gonna run around</string>
+	<string>Never gonna let you down</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Never gonna run around</string>
+	<key>NSContactsUsageDescription</key>
+	<string>and desert you</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Never gonna make you cry</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Never gonna say goodbye</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Never gonna tell a lie</string>
 </dict>
 </plist>
