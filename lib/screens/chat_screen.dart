@@ -1,16 +1,18 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
+
 import 'package:duochat/widget/chat_messages.dart';
 import 'package:duochat/widget/loading.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:image_picker/image_picker.dart';
+
 import '../models.dart';
 
 class ChatScreenArguments {
@@ -56,7 +58,13 @@ class _ChatScreenState extends State<ChatScreen> {
   Future uploadFile(chatId) async {
     try {
       Random rnd = new Random();
-      String ref = 'uploads/' + DateTime.now().microsecondsSinceEpoch.toString() + "--" +  rnd.nextInt(100000).toString() + "--" + _image.path.replaceAll("/", "_");
+      String ref = 'uploads/' +
+          DateTime.now().microsecondsSinceEpoch.toString() +
+          "--" +
+          rnd.nextInt(100000).toString() +
+          "--" +
+          _image.path.replaceAll("/", "_");
+      showAlertDialog(context);
       await firebase_storage.FirebaseStorage.instance
           .ref(ref)
           .putFile(File(_image.path));
@@ -82,14 +90,34 @@ class _ChatScreenState extends State<ChatScreen> {
             .child("messages")
             .push()
             .set(message.toMap());
+        Navigator.pop(context);
       });
     } on firebase_core.FirebaseException catch (e) {
       // e.g, e.code == 'canceled'
       print(e);
     }
     print("uploaded");
-
   }
+
+  showAlertDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: new Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(
+              margin: EdgeInsets.only(left: 16), child: Text("Uploading...")),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   void handleChatMessageSubmit(String chatId) {
     print("send " + myController.text + " " + chatId);
     final String text = myController.text;
@@ -114,7 +142,6 @@ class _ChatScreenState extends State<ChatScreen> {
           .push()
           .set(message.toMap());
     });
-
 
     myController.clear();
     myFocusNode.requestFocus();
@@ -205,7 +232,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Icon(Icons.image),
                     color: Colors.grey.shade500,
                     borderRadius: BorderRadius.all(Radius.circular(100.0)),
-                    onPressed:  () async {
+                    onPressed: () async {
                       print("Send Image");
                       await chooseFile();
                       print("chosen");
