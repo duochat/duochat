@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:duochat/widget/chat_messages.dart';
-import 'package:duochat/widget/loading.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
@@ -194,7 +193,15 @@ class _ChatScreenState extends State<ChatScreen> {
                     .child("messages")
                     .onValue,
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) return Loading();
+                  if (!snapshot.hasData)
+                    return Container(
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    );
 
                   List<ChatMessage> messages =
                       (snapshot.data.snapshot.value ?? {})
