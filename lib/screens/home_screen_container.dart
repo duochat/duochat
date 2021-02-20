@@ -12,7 +12,7 @@ class HomeScreenContainer extends StatefulWidget {
 }
 
 class _HomeScreenContainerState extends State<HomeScreenContainer> {
-  int currentPage = 0;
+  int currentPage = 1;
   final _pageController = PageController(initialPage: 1);
 
   @override

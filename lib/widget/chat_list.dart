@@ -1,6 +1,8 @@
 import 'package:duochat/screens/chat_screen.dart';
+import 'package:duochat/widget/user_card.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../models.dart';
 
@@ -12,11 +14,78 @@ class ChatList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ListView.separated(
+      child: ListView.builder(
         itemCount: chats.length,
-        separatorBuilder: (BuildContext context, int index) => Divider(),
+        //separatorBuilder: (BuildContext context, int index) => Divider(),
         itemBuilder: (BuildContext context, int index) {
           final Chat chat = chats[index];
+          return StreamBuilder<dynamic>(
+            stream: FirebaseDatabase.instance
+                .reference()
+                .child('chats')
+                .child(chat.id)
+                .child("messages")
+                .onValue,
+            builder: (context, snapshot) {
+              String text = "Loading...";
+              String time = "";
+
+              if (snapshot.hasData) {
+                List<ChatMessage> messages =
+                (snapshot.data.snapshot.value ?? {})
+                    .values
+                    .map<ChatMessage>((message) =>
+                    ChatMessage.fromMap(message))
+                    .toList();
+                messages.sort((a, b) =>
+                    a.timestamp.compareTo(b.timestamp));
+                if (messages.isEmpty) {
+                  text = "Say hi to " + chat.name + "!";
+                } else {
+                  text = messages.last.text;
+                  time = DateFormat('jm').format(messages.last.timestamp);
+                }
+              }
+
+              return UserCard(
+                user: PublicUserData(
+                  name: chat.name,
+                  photoURL: chat.photoURL,
+                ),
+                message: text,
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  ChatScreen.id,
+                  arguments: ChatScreenArguments(chat),
+                ),
+                contextWidget: Column(
+                 crossAxisAlignment: CrossAxisAlignment.end,
+                 children: <Widget>[
+                   Text(time),
+                   SizedBox(
+                     height: 5.0,
+                   ),
+                   Container(
+                     width: 40.0,
+                     height: 20.0,
+                     decoration: BoxDecoration(
+                       color: Theme.of(context).primaryColor,
+                       borderRadius: BorderRadius.circular(30.0),
+                     ),
+                     alignment: Alignment.center,
+                     child: Text(
+                       'NEW',
+                       style: TextStyle(
+                         color: Colors.white,
+                         fontSize: 12.0,
+                         fontWeight: FontWeight.bold,
+                       ),
+                     ),
+                   ),
+                 ],
+               ),
+              );
+            });
           return GestureDetector(
             onTap: () {
               Navigator.pushNamed(
