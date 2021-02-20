@@ -113,12 +113,9 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 	@override
 	void initState() {
 		super.initState();
-		Future.delayed(Duration(milliseconds: 1000), () {
-			_refreshIndicatorKey.currentState?.show();
-		});
 	}
 
-	Future<void> _updateConnections() async {
+	Future<bool> _updateConnections() async {
 		User firebaseUser = Provider.of<User>(context, listen: false);
 		if(firebaseUser == null) {
 			Future.delayed(Duration(milliseconds: 1000), () {
@@ -134,6 +131,7 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 			_outgoingRequests = requestsData.outgoingRequests.toList();
 			_connections = connectionsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
 		});
+		return true;
 	}
 
   int requestsRowCount() =>
@@ -142,56 +140,85 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 	@override
 	Widget build(BuildContext context) {
 		return Expanded(
-			child: RefreshIndicator(
-				key: _refreshIndicatorKey,
-				onRefresh: _updateConnections,
-			  child: ListView.builder(
-			  	itemCount: _connections.length + requestsRowCount(),
-			  	itemBuilder: (BuildContext context, int index) {
-			  		if(index == 0 && _incomingRequests.isNotEmpty) {
-			  			return UserCard(
-			  				user: PublicUserData(
-			  					name: '${_incomingRequests.length} Incoming Request${_incomingRequests.length>1 ? 's' : ''}',
-			  				),
-								contextWidget: Icon(Icons.arrow_forward_ios_rounded),
-			  				onTap: () => Navigator.pushNamed(
-									context,
-									IncomingRequestsScreen.id,
-									arguments: RequestsScreenArguments(
-										onRefresh: _updateConnections,
-								)),
-			  			);
-			  		}
-			  		if((index == 0 && _incomingRequests.isEmpty)
-			  			|| (index == 1 && _incomingRequests.isNotEmpty)
-			  			&& _outgoingRequests.isNotEmpty) {
+			child: FutureBuilder<bool>(
+				future: _updateConnections(),
+			  builder: (context, snapshot) {
+					if(snapshot.hasData) {
+						return RefreshIndicator(
+							key: _refreshIndicatorKey,
+							onRefresh: _updateConnections,
+							child: ListView.builder(
+								itemCount: _connections.length + requestsRowCount(),
+								itemBuilder: (BuildContext context, int index) {
+									if (index == 0 && _incomingRequests.isNotEmpty) {
+										return UserCard(
+											user: PublicUserData(
+												name: '${_incomingRequests
+														.length} Incoming Request${_incomingRequests
+														.length >
+														1 ? 's' : ''}',
+											),
+											contextWidget: Icon(Icons.arrow_forward_ios_rounded),
+											onTap: () =>
+													Navigator.pushNamed(
+															context,
+															IncomingRequestsScreen.id,
+															arguments: RequestsScreenArguments(
+																onRefresh: _updateConnections,
+															)),
+										);
+									}
+									if ((index == 0 && _incomingRequests.isEmpty)
+											|| (index == 1 && _incomingRequests.isNotEmpty)
+													&& _outgoingRequests.isNotEmpty) {
+										return UserCard(
+											user: PublicUserData(
+												name: '${_outgoingRequests
+														.length} Outgoing Request${_outgoingRequests
+														.length >
+														1 ? 's' : ''}',
+											),
+											contextWidget: Icon(Icons.arrow_forward_ios_rounded),
+											onTap: () =>
+													Navigator.pushNamed(
+															context,
+															OutgoingRequestsScreen.id,
+															arguments: RequestsScreenArguments(
+																onRefresh: _refreshIndicatorKey.currentState
+																		?.show,
+															)),
+										);
+									}
+									return UserCard(
+										user: _connections[index - requestsRowCount()],
+										message: _connections[index - requestsRowCount()].username,
+										onTap: () =>
+												Navigator.pushNamed(
+													context,
+													ProfileScreen.id,
+													arguments: ProfileScreenArguments(
+														user: _connections[index - requestsRowCount()],
+														onRefresh: _refreshIndicatorKey.currentState?.show,
+													),
+												),
+									);
+								},
+							),
+						);
+					}
+					return ListView.builder(
+						itemCount: 5,
+						itemBuilder: (BuildContext context, int index) {
 							return UserCard(
 								user: PublicUserData(
-									name: '${_outgoingRequests.length} Outgoing Request${_outgoingRequests.length>1 ? 's' : ''}',
+										name: 'Loading...',
+										photoURL: 'https://firebasestorage.googleapis.com/v0/b/duochat-app.appspot.com/o/duochat.png?alt=media&token=2cf67fee-ba58-4641-baed-89452f07c5d8'
 								),
-								contextWidget: Icon(Icons.arrow_forward_ios_rounded),
-								onTap: () => Navigator.pushNamed(
-									context,
-									OutgoingRequestsScreen.id,
-									arguments: RequestsScreenArguments(
-									onRefresh: _refreshIndicatorKey.currentState?.show,
-								)),
+								message: 'Loading...',
 							);
-			  		}
-			  		return UserCard(
-			  			user: _connections[index - requestsRowCount()],
-			  			message: _connections[index - requestsRowCount()].username,
-			  			onTap: () => Navigator.pushNamed(
-			  				context,
-			  				ProfileScreen.id,
-			  				arguments: ProfileScreenArguments(
-									user: _connections[index - requestsRowCount()],
-									onRefresh: _refreshIndicatorKey.currentState?.show,
-								),
-			  			),
-			  		);
-			  	},
-			  ),
+						},
+					);
+				}
 			),
 		);
 	}

@@ -25,20 +25,6 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   List<PublicUserData> _requests = [];
   Function onRefresh;
-  
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration(milliseconds: 1000), () {
-      _refreshIndicatorKey.currentState?.show();
-    });
-  }
-  
-  @override
-  void dispose() {
-    if(onRefresh != null) onRefresh();
-    super.dispose();
-  }
 
   Future<void> _updateRequests() async {
     User firebaseUser = Provider.of<User>(context, listen: false);
@@ -95,52 +81,55 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
                 ),
               ),
               Expanded(
-                child: RefreshIndicator(
-                  key: _refreshIndicatorKey,
-                  onRefresh: _updateRequests,
-                  child: ListView.builder(
-                    itemCount: _requests.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return UserCard(
-                        user: _requests[index],
-                        message: _requests[index].username,
-                        onTap: () => Navigator.pushNamed(
-                          context,
-                          ProfileScreen.id,
-                          arguments: ProfileScreenArguments(
-                            user: _requests[index],
-                            onRefresh: _updateRequests,
+                child: FutureBuilder(
+                  future: _updateRequests(),
+                  builder: (context, snapshot) => RefreshIndicator(
+                    key: _refreshIndicatorKey,
+                    onRefresh: _updateRequests,
+                    child: ListView.builder(
+                      itemCount: _requests.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return UserCard(
+                          user: _requests[index],
+                          message: _requests[index].username,
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            ProfileScreen.id,
+                            arguments: ProfileScreenArguments(
+                              user: _requests[index],
+                              onRefresh: _updateRequests,
+                            ),
                           ),
-                        ),
-                        contextWidget: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            TextButton(
-                              child: Icon(Icons.check),
-                              onPressed: () async {
-                                await DatabaseService.acceptRequest(context, _requests[index].id);
-                                _updateRequests();
-                              },
-                              style: TextButton.styleFrom(
-                                minimumSize: Size.fromRadius(10),
-                                shape: CircleBorder(),
+                          contextWidget: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              TextButton(
+                                child: Icon(Icons.check),
+                                onPressed: () async {
+                                  await DatabaseService.acceptRequest(context, _requests[index].id);
+                                  _updateRequests();
+                                },
+                                style: TextButton.styleFrom(
+                                  minimumSize: Size.fromRadius(10),
+                                  shape: CircleBorder(),
+                                ),
                               ),
-                            ),
-                            OutlinedButton(
-                              child: Icon(Icons.clear),
-                              onPressed: () async {
-                                await DatabaseService.rejectRequest(context, _requests[index].id);
-                                _updateRequests();
-                              },
-                              style: OutlinedButton.styleFrom(
-                                minimumSize: Size.fromRadius(10),
-                                shape: CircleBorder(),
+                              OutlinedButton(
+                                child: Icon(Icons.clear),
+                                onPressed: () async {
+                                  await DatabaseService.rejectRequest(context, _requests[index].id);
+                                  _updateRequests();
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  minimumSize: Size.fromRadius(10),
+                                  shape: CircleBorder(),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -163,20 +152,6 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   List<PublicUserData> _requests = [];
   Function onRefresh;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration(milliseconds: 1000), () {
-      _refreshIndicatorKey.currentState?.show();
-    });
-  }
-
-  @override
-  void dispose() {
-    if(onRefresh != null) onRefresh();
-    super.dispose();
-  }
 
   Future<void> _updateRequests() async {
     User firebaseUser = Provider.of<User>(context, listen: false);
@@ -233,37 +208,40 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
                 ),
               ),
               Expanded(
-                child: RefreshIndicator(
-                  key: _refreshIndicatorKey,
-                  onRefresh: _updateRequests,
-                  child: ListView.builder(
-                    itemCount: _requests.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return UserCard(
-                        user: _requests[index],
-                        message: _requests[index].username,
-                        onTap: () =>
-                            Navigator.pushNamed(
-                              context,
-                              ProfileScreen.id,
-                              arguments: ProfileScreenArguments(
-                                user: _requests[index],
-                                onRefresh: _updateRequests,
+                child: FutureBuilder(
+                  future: _updateRequests(),
+                  builder: (context, snapshot) => RefreshIndicator(
+                    key: _refreshIndicatorKey,
+                    onRefresh: _updateRequests,
+                    child: ListView.builder(
+                      itemCount: _requests.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return UserCard(
+                          user: _requests[index],
+                          message: _requests[index].username,
+                          onTap: () =>
+                              Navigator.pushNamed(
+                                context,
+                                ProfileScreen.id,
+                                arguments: ProfileScreenArguments(
+                                  user: _requests[index],
+                                  onRefresh: _updateRequests,
+                                ),
                               ),
+                          contextWidget: OutlinedButton(
+                            child: Icon(Icons.clear),
+                            onPressed: () async {
+                              await DatabaseService.cancelRequest(context, _requests[index].id);
+                              _updateRequests();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: Size.fromRadius(10),
+                              shape: CircleBorder(),
                             ),
-                        contextWidget: OutlinedButton(
-                          child: Icon(Icons.clear),
-                          onPressed: () async {
-                            await DatabaseService.cancelRequest(context, _requests[index].id);
-                            _updateRequests();
-                          },
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: Size.fromRadius(10),
-                            shape: CircleBorder(),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
