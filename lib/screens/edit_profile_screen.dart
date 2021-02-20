@@ -15,6 +15,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController nameController;
+  TextEditingController usernameController;
   TextEditingController bioController;
   TextEditingController interestsController;
 
@@ -22,6 +23,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     nameController = new TextEditingController(text: "Loading...");
+    usernameController = new TextEditingController(text: "Loading...");
     bioController = new TextEditingController(text: "Loading...");
     interestsController = new TextEditingController(text: "Loading...");
 
@@ -32,6 +34,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         .then((snap) {
       PublicUserData data = PublicUserData.fromMap(snap.data());
       nameController.text = data.name;
+      usernameController.text = data.username;
       bioController.text = data.bio;
       interestsController.text = data.interests;
     });
@@ -41,6 +44,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void dispose() {
     nameController.dispose();
     super.dispose();
+  }
+
+  void saveProfile() async {
+
+    FirebaseFirestore.instance
+        .collection('publicUserInfo')
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .update({
+      "name": nameController.text,
+      "username": usernameController.text,
+      "bio": bioController.text,
+      "interests": interestsController.text,
+    }).then((value) {
+      Navigator.pop(context);
+    });
   }
 
   @override
@@ -55,16 +73,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               suffix: CupertinoButton(
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
-                    FirebaseFirestore.instance
-                        .collection('publicUserInfo')
-                        .doc(FirebaseAuth.instance.currentUser.uid)
-                        .update({
-                      "name": nameController.text,
-                      "bio": bioController.text,
-                      "interests": interestsController.text,
-                    }).then((value) {
-                      Navigator.pop(context);
-                    });
+                    saveProfile();
                   }
                 },
                 child: Row(
@@ -92,6 +101,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(vertical: 5),
                         labelText: 'Name',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'This field is required.';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 16.0),
+                    TextFormField(
+                      controller: usernameController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(vertical: 5),
+                        labelText: 'Username',
                       ),
                       validator: (value) {
                         if (value.isEmpty) {

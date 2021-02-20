@@ -56,85 +56,83 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   SizedBox(height: 15.0),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            alignment: Alignment.center,
-                            child: Stack(
-                              children: <Widget>[
-                                QrImage(
-                                  data: data.username,
-                                  version: QrVersions.auto,
-                                  errorCorrectionLevel: QrErrorCorrectLevel.H,
-                                  size: 200,
-                                  gapless: true,
-                                ),
-                                Positioned.fill(
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Container(
-                                      padding: EdgeInsets.all(3.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: CircleAvatar(
-                                        radius: 28.0,
-                                        backgroundImage:
-                                            NetworkImage(data.photoURL),
-                                      ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.center,
+                          child: Stack(
+                            children: <Widget>[
+                              QrImage(
+                                data: data.username,
+                                version: QrVersions.auto,
+                                errorCorrectionLevel: QrErrorCorrectLevel.H,
+                                size: 200,
+                                gapless: true,
+                              ),
+                              Positioned.fill(
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    padding: EdgeInsets.all(3.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 28.0,
+                                      backgroundImage:
+                                          NetworkImage(data.photoURL),
                                     ),
                                   ),
-                                )
-                              ],
-                            ),
+                                ),
+                              )
+                            ],
                           ),
-                          SizedBox(height: 24.0),
-                          Text(
-                            data.name,
-                            style: TextStyle(
-                              fontSize: 30.0,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        ),
+                        SizedBox(height: 24.0),
+                        Text(
+                          data.name,
+                          style: TextStyle(
+                            fontSize: 30.0,
+                            fontWeight: FontWeight.bold,
                           ),
-                          SizedBox(height: 12.0),
-                          Text(
-                            "User Bio",
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
-                            ),
+                        ),
+                        SizedBox(height: 12.0),
+                        Text(
+                          "User Bio",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
                           ),
-                          Text(
-                            data.bio,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black87,
-                            ),
+                        ),
+                        Text(
+                          data.bio,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.black87,
                           ),
-                          SizedBox(height: 12.0),
-                          Text(
-                            "Career Interests",
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
-                            ),
+                        ),
+                        SizedBox(height: 12.0),
+                        Text(
+                          "Career Interests",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
                           ),
-                          Text(
-                            data.interests,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.black87,
-                            ),
+                        ),
+                        Text(
+                          data.interests,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.black87,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
