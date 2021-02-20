@@ -8,9 +8,8 @@ import 'package:provider/provider.dart';
 
 class ProfileScreenArguments {
   final PublicUserData user;
-  final Function onRefresh;
 
-  ProfileScreenArguments({this.user, this.onRefresh});
+  ProfileScreenArguments({this.user});
 }
 
 class ProfileScreen extends StatefulWidget {
@@ -23,7 +22,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
 
   PublicUserData user;
-  Function onRefresh;
   bool sendingRequest = false;
   int connectionState = 0; // 1: not connected, 2: outgoing request, 3: incoming request, 4: connected
 
@@ -55,7 +53,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final ProfileScreenArguments args = ModalRoute.of(context).settings.arguments;
     user = args.user;
-    onRefresh = args.onRefresh;
 
     return Scaffold(
       backgroundColor: Colors.white,

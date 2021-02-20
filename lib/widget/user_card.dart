@@ -1,6 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:duochat/models.dart';
 
+class SlideIn extends StatefulWidget {
+
+  final Widget child;
+  final Duration duration;
+  final Duration reverseDuration;
+  final Duration delay;
+
+  SlideIn({
+    Key key,
+    this.child = const SizedBox(width: 0, height: 0),
+    this.duration = const Duration(milliseconds: 500),
+    this.reverseDuration,
+    this.delay = Duration.zero,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => SlideInState(
+    child: child,
+    duration: duration,
+    reverseDuration: reverseDuration,
+    delay: delay,
+  );
+}
+
+class SlideInState extends State<SlideIn> with SingleTickerProviderStateMixin {
+
+  AnimationController _animationController;
+  Animation<Offset> _appearAnimation;
+  bool isVisible = false;
+
+  final Widget child;
+  final Duration duration;
+  final Duration reverseDuration;
+  final Duration delay;
+
+  SlideInState({
+    this.child,
+    this.duration,
+    this.reverseDuration,
+    this.delay,
+  });
+
+  void slideIn() {
+    Future.delayed(delay, () {
+      _animationController.forward();
+      setState(() { isVisible = true; });
+    });
+  }
+  void slideOut() {
+    Future.delayed(delay, () {
+      _animationController.reverse();
+      setState(() { isVisible = false; });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: duration,
+      reverseDuration: reverseDuration,
+      vsync: this,
+    );
+    _appearAnimation = Tween<Offset>(
+      begin: const Offset(-1, 0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
+    Future.delayed(delay, () {
+      _animationController.forward();
+      setState(() { isVisible = true; });
+    });
+  }
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(),
+      child: SlideTransition(
+        position: _appearAnimation,
+        child: AnimatedOpacity(
+          opacity: isVisible ? 1 : 0,
+          duration: duration,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+}
+
 class UserCard extends StatelessWidget {
 
   final PublicUserData user;
@@ -35,7 +134,7 @@ class UserCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             user.photoURL != null
-            ? Container(
+                ? Container(
               child: CircleAvatar(
                 radius: 35.0,
                 backgroundImage: NetworkImage(user.photoURL),
@@ -66,7 +165,7 @@ class UserCard extends StatelessWidget {
                     ),
                   ),
                   message != ''
-                  ? Container(
+                      ? Container(
                     //width: MediaQuery.of(context).size.width - 210,
                     child: Text(
                       message,

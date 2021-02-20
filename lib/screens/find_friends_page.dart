@@ -33,14 +33,28 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 
 	bool _isSearching = false;
 	List<PublicUserData> _searchResults = [];
+	
+	List<GlobalKey<SlideInState>> _searchCardKeys = [];
 
-	void _updateSearch(String keyword) {
+	void _updateSearch(String keyword) async {
+
+		_searchCardKeys.forEach((key) => key.currentState.slideOut());
+
+		if(_searchResults.length > 0) {
+			await Future.delayed(Duration(milliseconds: 200));
+		}
+		setState(() { _searchResults = []; });
+		await Future.delayed(Duration(milliseconds: 10));
 		setState(() {
 			// TODO: replace this with firebase integration
 			_searchResults = _users
 					.where((user) =>
 			user.name.toLowerCase().contains(keyword.toLowerCase()) ||
 					user.username.toLowerCase().contains(keyword.toLowerCase())).toList();
+			_searchCardKeys = List<GlobalKey<SlideInState>>();
+			for(int i = 0; i < _searchResults.length; i++) {
+				_searchCardKeys.add(GlobalKey<SlideInState>());
+			}
 		});
 	}
 	
@@ -88,7 +102,7 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 								)
 			      	),
 			      _isSearching
-						? _UserSearchList(results: _searchResults)
+						? _UserSearchList(results: _searchResults, userCardKeys: _searchCardKeys)
 						: _ConnectionsList()
 		      ],
 	      ),
@@ -105,7 +119,9 @@ class _ConnectionsList extends StatefulWidget {
 
 class _ConnectionsListState extends State<_ConnectionsList> {
 
-	final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+	GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+	List<GlobalKey<SlideInState>> _userCardKeys = [];
+
 	List<String> _incomingRequests = [];
 	List<String> _outgoingRequests = [];
 	List<PublicUserData> _connections = [];
@@ -113,25 +129,39 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 	@override
 	void initState() {
 		super.initState();
+		Future.delayed(Duration(milliseconds: 0), () {
+			_refreshIndicatorKey.currentState.show();
+		});
 	}
 
-	Future<bool> _updateConnections() async {
+	Future<void> _updateConnections() async {
+
+		_userCardKeys.forEach((key) => key.currentState.slideOut());
+
 		User firebaseUser = Provider.of<User>(context, listen: false);
-		if(firebaseUser == null) {
-			Future.delayed(Duration(milliseconds: 1000), () {
-				_refreshIndicatorKey.currentState?.show();
-			});
-		}
 		PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
 		PublicUserData connectionsData = await PublicUserData.fromID(firebaseUser.uid);
 		QuerySnapshot connectionsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
 				.where('id', whereIn: connectionsData.connections.toList()+['']).get();
+
+		if(_connections.length + requestsRowCount() > 0) {
+			await Future.delayed(Duration(milliseconds: 500));
+		}
+		setState(() {
+			_incomingRequests = [];
+			_outgoingRequests = [];
+			_connections = [];
+		});
+		await Future.delayed(Duration(milliseconds: 10));
 		setState(() {
 			_incomingRequests = requestsData.incomingRequests.toList();
 			_outgoingRequests = requestsData.outgoingRequests.toList();
 			_connections = connectionsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+			_userCardKeys = List<GlobalKey<SlideInState>>();
+			for(int i = 0; i < _connections.length + requestsRowCount(); i++) {
+				_userCardKeys.add(GlobalKey<SlideInState>());
+			}
 		});
-		return true;
 	}
 
   int requestsRowCount() =>
@@ -140,85 +170,69 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 	@override
 	Widget build(BuildContext context) {
 		return Expanded(
-			child: FutureBuilder<bool>(
-				future: _updateConnections(),
-			  builder: (context, snapshot) {
-					if(snapshot.hasData) {
-						return RefreshIndicator(
-							key: _refreshIndicatorKey,
-							onRefresh: _updateConnections,
-							child: ListView.builder(
-								itemCount: _connections.length + requestsRowCount(),
-								itemBuilder: (BuildContext context, int index) {
-									if (index == 0 && _incomingRequests.isNotEmpty) {
-										return UserCard(
-											user: PublicUserData(
-												name: '${_incomingRequests
-														.length} Incoming Request${_incomingRequests
-														.length >
-														1 ? 's' : ''}',
-											),
-											contextWidget: Icon(Icons.arrow_forward_ios_rounded),
-											onTap: () =>
-													Navigator.pushNamed(
-															context,
-															IncomingRequestsScreen.id,
-															arguments: RequestsScreenArguments(
-																onRefresh: _updateConnections,
-															)),
-										);
-									}
-									if ((index == 0 && _incomingRequests.isEmpty)
-											|| (index == 1 && _incomingRequests.isNotEmpty)
-													&& _outgoingRequests.isNotEmpty) {
-										return UserCard(
-											user: PublicUserData(
-												name: '${_outgoingRequests
-														.length} Outgoing Request${_outgoingRequests
-														.length >
-														1 ? 's' : ''}',
-											),
-											contextWidget: Icon(Icons.arrow_forward_ios_rounded),
-											onTap: () =>
-													Navigator.pushNamed(
-															context,
-															OutgoingRequestsScreen.id,
-															arguments: RequestsScreenArguments(
-																onRefresh: _refreshIndicatorKey.currentState
-																		?.show,
-															)),
-										);
-									}
-									return UserCard(
+			child: RefreshIndicator(
+				key: _refreshIndicatorKey,
+				onRefresh: _updateConnections,
+				child: ListView.builder(
+					itemCount: _connections.length + requestsRowCount(),
+					itemBuilder: (BuildContext context, int index) {
+						if (index == 0 && _incomingRequests.isNotEmpty) {
+							return SlideIn(
+								key: _userCardKeys[index],
+								delay: Duration(milliseconds: index*50),
+								child: UserCard(
+									user: PublicUserData(
+										name: '${_incomingRequests
+												.length} Incoming Request${_incomingRequests
+												.length >
+												1 ? 's' : ''}',
+									),
+									contextWidget: Icon(Icons.arrow_forward_ios_rounded),
+									onTap: () => Navigator.pushNamed(
+										context,
+										IncomingRequestsScreen.id,
+									),
+								),
+							);
+						}
+						if ((index == 0 && _incomingRequests.isEmpty)
+								|| (index == 1 && _incomingRequests.isNotEmpty)
+										&& _outgoingRequests.isNotEmpty) {
+							return SlideIn(
+								key: _userCardKeys[index],
+								delay: Duration(milliseconds: index*50),
+								child: UserCard(
+									user: PublicUserData(
+										name: '${_outgoingRequests
+												.length} Outgoing Request${_outgoingRequests
+												.length >
+												1 ? 's' : ''}',
+									),
+									contextWidget: Icon(Icons.arrow_forward_ios_rounded),
+									onTap: () => Navigator.pushNamed(
+										context,
+										OutgoingRequestsScreen.id,
+									),
+								),
+							);
+						}
+						return SlideIn(
+							key: _userCardKeys[index],
+							delay: Duration(milliseconds: index*50),
+							child: UserCard(
+								user: _connections[index - requestsRowCount()],
+								message: _connections[index - requestsRowCount()].username,
+								onTap: () => Navigator.pushNamed(
+									context,
+									ProfileScreen.id,
+									arguments: ProfileScreenArguments(
 										user: _connections[index - requestsRowCount()],
-										message: _connections[index - requestsRowCount()].username,
-										onTap: () =>
-												Navigator.pushNamed(
-													context,
-													ProfileScreen.id,
-													arguments: ProfileScreenArguments(
-														user: _connections[index - requestsRowCount()],
-														onRefresh: _refreshIndicatorKey.currentState?.show,
-													),
-												),
-									);
-								},
+									),
+								),
 							),
 						);
-					}
-					return ListView.builder(
-						itemCount: 5,
-						itemBuilder: (BuildContext context, int index) {
-							return UserCard(
-								user: PublicUserData(
-										name: 'Loading...',
-										photoURL: 'https://firebasestorage.googleapis.com/v0/b/duochat-app.appspot.com/o/duochat.png?alt=media&token=2cf67fee-ba58-4641-baed-89452f07c5d8'
-								),
-								message: 'Loading...',
-							);
-						},
-					);
-				}
+					},
+				),
 			),
 		);
 	}
@@ -227,13 +241,14 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 
 class _UserSearchList extends StatelessWidget {
 
+	final List<GlobalKey<SlideInState>> userCardKeys;
+
 	final List<PublicUserData> results;
-	final Function onRefresh;
 
 	_UserSearchList({
 		Key key,
 		this.results,
-		this.onRefresh,
+		this.userCardKeys,
 	}) : super(key: key);
 
 	@override
@@ -242,17 +257,21 @@ class _UserSearchList extends StatelessWidget {
 			child: ListView.builder(
 				itemCount: results.length,
 				itemBuilder: (BuildContext context, int index) {
-					return UserCard(
-						user: results[index],
-						message: results[index].username,
-						onTap: () => Navigator.pushNamed(
-							context,
-							ProfileScreen.id,
-							arguments: ProfileScreenArguments(
-								user: results[index],
-								onRefresh: onRefresh,
-							),
-						),
+					return SlideIn(
+						key: userCardKeys[index],
+						duration: Duration(milliseconds: 100),
+						delay: Duration(milliseconds: index*50),
+					  child: UserCard(
+					  	user: results[index],
+					  	message: results[index].username,
+					  	onTap: () => Navigator.pushNamed(
+					  		context,
+					  		ProfileScreen.id,
+					  		arguments: ProfileScreenArguments(
+					  			user: results[index],
+					  		),
+					  	),
+					  ),
 					);
 				},
 			),
