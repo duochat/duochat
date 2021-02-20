@@ -70,6 +70,7 @@ class UserCard extends StatelessWidget {
                     //width: MediaQuery.of(context).size.width - 210,
                     child: Text(
                       message,
+                      maxLines: 2,
                       style: TextStyle(
                         color: Colors.black87,
                         fontSize: 15.0,
