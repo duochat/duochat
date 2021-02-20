@@ -33,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
         if (data == null) return Container();
 
         return Scaffold(
+          backgroundColor: Colors.white,
           body: SafeArea(
             child: Container(
               width: double.infinity,

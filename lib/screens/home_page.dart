@@ -7,7 +7,6 @@ import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -15,27 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<PublicUserData> _connections = [];
-
-  void initState() {
-    super.initState();
-    _updateConnections();
-  }
-
-  Future<void> _updateConnections() async {
-    User firebaseUser = Provider.of<User>(context, listen: false);
-    PublicUserData connectionsData =
-        await PublicUserData.fromID(firebaseUser.uid);
-    QuerySnapshot connectionsSnapshot = await FirebaseFirestore.instance
-        .collection("publicUserInfo")
-        .where('id', whereIn: connectionsData.connections.toList() + [''])
-        .get();
-    setState(() {
-      _connections = connectionsSnapshot.docs
-          .map((doc) => PublicUserData.fromMap(doc.data()))
-          .toList();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +23,8 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: <Widget>[
             TopNavBar(
-              image: NetworkImage('https://picsum.photos/200/200'),
+              image: AssetImage('graphics/logo.png'),
+              hasImageBorder: false,
               title: 'DuoChat',
               suffix: CupertinoButton(
                 onPressed: () {

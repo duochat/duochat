@@ -19,17 +19,19 @@ class _HomeScreenContainerState extends State<HomeScreenContainer> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-          controller: _pageController,
-          children: <Widget>[
-            ProfilePage(),
-            HomePage(),
-            FindFriendsPage(),
-          ],
-          onPageChanged: (index) {
-            setState(() {
-              currentPage = index;
-            });
-          }),
+        controller: _pageController,
+        physics: ClampingScrollPhysics(),
+        children: <Widget>[
+          ProfilePage(),
+          HomePage(),
+          FindFriendsPage(),
+        ],
+        onPageChanged: (index) {
+          setState(() {
+            currentPage = index;
+          });
+        }
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentPage,
         onTap: (index) {

@@ -118,6 +118,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void handleChatMessageSubmit(String chatId) {
+
+    if(myController.text.trim() == '') {
+      myFocusNode.requestFocus();
+      return;
+    }
+
     print("send " + myController.text + " " + chatId);
     final String text = myController.text;
 
@@ -143,7 +149,6 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     myController.clear();
-    myFocusNode.requestFocus();
   }
 
   @override
@@ -211,31 +216,21 @@ class _ChatScreenState extends State<ChatScreen> {
                           .toList();
                   messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-                  return ChatMessages(messages: messages);
+                  return NotificationListener<ScrollStartNotification>(
+                    child: ChatMessages(messages: messages),
+                    onNotification: (notification) {
+                      myFocusNode.unfocus();
+                      return true;
+                    },
+                  );
                 },
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(12.0),
-              child: CupertinoTextField(
-                controller: myController,
-                focusNode: myFocusNode,
-                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                placeholder: "Message here...",
-                decoration: BoxDecoration(
-                  color: Color(0xFFF6F6F6),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(100.0),
-                  ),
-                  border: Border.all(color: Color(0xFFE8E8E8)),
-                ),
-                textInputAction: TextInputAction.send,
-                onSubmitted: (result) {
-                  handleChatMessageSubmit(chatId);
-                },
-                prefix: Padding(
-                  padding: EdgeInsets.only(left: 6.0),
-                  child: CupertinoButton(
+              child: Row(
+                children: [
+                  CupertinoButton(
                     child: Icon(Icons.image),
                     color: Colors.grey.shade500,
                     borderRadius: BorderRadius.all(Radius.circular(100.0)),
@@ -246,23 +241,41 @@ class _ChatScreenState extends State<ChatScreen> {
                       await uploadFile(chatId);
                       print("upload");
                     },
-                    padding: EdgeInsets.all(0.0),
+                    padding: EdgeInsets.all(8.0),
                     minSize: 34.0,
                   ),
-                ),
-                suffix: Padding(
-                  padding: EdgeInsets.only(right: 6.0),
-                  child: CupertinoButton(
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: CupertinoTextField(
+                      controller: myController,
+                      focusNode: myFocusNode,
+                      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                      placeholder: "Message here...",
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF6F6F6),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(100.0),
+                        ),
+                        border: Border.all(color: Color(0xFFE8E8E8)),
+                      ),
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (result) {
+                        handleChatMessageSubmit(chatId);
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  CupertinoButton(
                     child: Icon(Icons.arrow_upward),
                     color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.all(Radius.circular(100.0)),
                     onPressed: () {
                       handleChatMessageSubmit(chatId);
                     },
-                    padding: EdgeInsets.all(0.0),
+                    padding: EdgeInsets.all(8.0),
                     minSize: 34.0,
                   ),
-                ),
+                ],
               ),
             ),
           ],

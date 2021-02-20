@@ -28,13 +28,19 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 	// 	PublicUserData(name: 'Cat with a name so long the card expands (should this be legal?) also you can\'t see the username anymore lol', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat_with_a_really_super_long_username'),
 	// 	PublicUserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
 	// 	]
-	
-	List<PublicUserData> _users = [];
 
+	List<GlobalKey<SlideInState>> _searchCardKeys = [];
+	final FocusNode searchBarFocusNode = FocusNode();
+
+	List<PublicUserData> _users = [];
 	bool _isSearching = false;
 	List<PublicUserData> _searchResults = [];
-	
-	List<GlobalKey<SlideInState>> _searchCardKeys = [];
+
+	@override
+	void dispose() {
+		super.dispose();
+		searchBarFocusNode.dispose();
+	}
 
 	void _updateSearch(String keyword) async {
 
@@ -84,26 +90,32 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 		      children: <Widget>[
 		      	_isSearching
 						? TopSearchBar(
-								hint: "Find connections...",
-								onChanged: _updateSearch,
-								suffix: IconButton(
-									icon: Icon(Icons.clear),
-									tooltip: "Close",
-									onPressed: hideSearchBar,
-								),
+							focusNode: searchBarFocusNode,
+							hint: "Find connections...",
+							onChanged: _updateSearch,
+							suffix: IconButton(
+								icon: Icon(Icons.clear),
+								tooltip: "Close",
+								onPressed: hideSearchBar,
+							),
+						) : TopNavBar(
+							image: AssetImage('graphics/logo.png'),
+							hasImageBorder: false,
+							title: _isSearching ? '' : 'Connections',
+							suffix: IconButton(
+								icon: Icon(Icons.search),
+								tooltip: "Find new connections",
+								onPressed: _showSearchBar,
 							)
-						: TopNavBar(
-								image: NetworkImage('https://picsum.photos/200/200'),
-								title: _isSearching ? '' : 'Connections',
-								suffix: IconButton(
-									icon: Icon(Icons.search),
-									tooltip: "Find new connections",
-									onPressed: _showSearchBar,
-								)
-			      	),
+						),
 			      _isSearching
-						? _UserSearchList(results: _searchResults, userCardKeys: _searchCardKeys)
-						: _ConnectionsList()
+						? NotificationListener<ScrollStartNotification>(
+							child: _UserSearchList(results: _searchResults, userCardKeys: _searchCardKeys),
+							onNotification: (notification) {
+								searchBarFocusNode.unfocus();
+								return true;
+							},
+						) : _ConnectionsList()
 		      ],
 	      ),
       ),
