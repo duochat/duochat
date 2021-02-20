@@ -191,12 +191,15 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 									onTap: () => Navigator.pushNamed(
 										context,
 										IncomingRequestsScreen.id,
+										arguments: RequestsScreenArguments(
+											_refreshIndicatorKey.currentState.show,
+										),
 									),
 								),
 							);
 						}
-						if ((index == 0 && _incomingRequests.isEmpty)
-								|| (index == 1 && _incomingRequests.isNotEmpty)
+						if (((index == 0 && _incomingRequests.isEmpty)
+								|| (index == 1 && _incomingRequests.isNotEmpty))
 										&& _outgoingRequests.isNotEmpty) {
 							return SlideIn(
 								key: _userCardKeys[index],
@@ -212,6 +215,9 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 									onTap: () => Navigator.pushNamed(
 										context,
 										OutgoingRequestsScreen.id,
+										arguments: RequestsScreenArguments(
+											_refreshIndicatorKey.currentState.show,
+										),
 									),
 								),
 							);
@@ -226,7 +232,8 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 									context,
 									ProfileScreen.id,
 									arguments: ProfileScreenArguments(
-										user: _connections[index - requestsRowCount()],
+										_connections[index - requestsRowCount()],
+										_refreshIndicatorKey.currentState.show,
 									),
 								),
 							),
@@ -268,7 +275,8 @@ class _UserSearchList extends StatelessWidget {
 					  		context,
 					  		ProfileScreen.id,
 					  		arguments: ProfileScreenArguments(
-					  			user: results[index],
+					  			results[index],
+									() {},
 					  		),
 					  	),
 					  ),

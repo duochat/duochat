@@ -9,8 +9,15 @@ import 'package:duochat/screens/profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class RequestsScreenArguments {
+  final Function refresh;
+  RequestsScreenArguments(this.refresh);
+}
+
 class IncomingRequestsScreen extends StatefulWidget {
+
   static String id = 'incoming_requests_screen';
+
   @override
   State<StatefulWidget> createState() => _IncomingRequestsScreenState();
 }
@@ -19,6 +26,7 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   List<GlobalKey<SlideInState>> _userCardKeys = [];
   List<PublicUserData> _requests = [];
+  Function refresh;
 
   @override
   void initState() {
@@ -26,6 +34,12 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
     Future.delayed(Duration(milliseconds: 0), () {
       _refreshIndicatorKey.currentState.show();
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    refresh();
   }
 
   Future<void> _updateRequests() async {
@@ -53,6 +67,9 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final RequestsScreenArguments args = ModalRoute.of(context).settings.arguments;
+    refresh = args.refresh;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -104,7 +121,8 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
                           context,
                           ProfileScreen.id,
                           arguments: ProfileScreenArguments(
-                            user: _requests[index],
+                            _requests[index],
+                            _refreshIndicatorKey.currentState.show,
                           ),
                         ),
                         contextWidget: Column(
@@ -149,7 +167,9 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
 }
 
 class OutgoingRequestsScreen extends StatefulWidget {
+
   static String id = 'outgoing_requests_screen';
+
   @override
   State<StatefulWidget> createState() => _OutgoingRequestsScreenState();
 }
@@ -158,7 +178,7 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   List<GlobalKey<SlideInState>> _userCardKeys = [];
   List<PublicUserData> _requests = [];
-  Function onRefresh;
+  Function refresh;
 
   @override
   void initState() {
@@ -166,6 +186,12 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
     Future.delayed(Duration(milliseconds: 0), () {
       _refreshIndicatorKey.currentState.show();
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    refresh();
   }
 
   Future<void> _updateRequests() async {
@@ -193,6 +219,9 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final RequestsScreenArguments args = ModalRoute.of(context).settings.arguments;
+    refresh = args.refresh;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -245,7 +274,8 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
                               context,
                               ProfileScreen.id,
                               arguments: ProfileScreenArguments(
-                                user: _requests[index],
+                                _requests[index],
+                                _refreshIndicatorKey.currentState.show,
                               ),
                             ),
                         contextWidget: OutlinedButton(

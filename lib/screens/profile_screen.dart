@@ -8,11 +8,13 @@ import 'package:provider/provider.dart';
 
 class ProfileScreenArguments {
   final PublicUserData user;
+  final Function refresh;
 
-  ProfileScreenArguments({this.user});
+  ProfileScreenArguments(this.user, this.refresh);
 }
 
 class ProfileScreen extends StatefulWidget {
+
   static String id = 'profile_screen';
 
   @override
@@ -22,13 +24,22 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
 
   PublicUserData user;
+  Function refresh;
+
   bool sendingRequest = false;
   int connectionState = 0; // 1: not connected, 2: outgoing request, 3: incoming request, 4: connected
+  bool changedState = false;
 
   @override
   void initState() {
     super.initState();
     updateConnection();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if(changedState) refresh();
   }
 
   Future<void> updateConnection() async {
@@ -53,6 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final ProfileScreenArguments args = ModalRoute.of(context).settings.arguments;
     user = args.user;
+    refresh = args.refresh;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -120,6 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               await DatabaseService.removeConnection(context, user.id);
                             }
                             await updateConnection();
+                            changedState = true;
                             setState(() { sendingRequest = false; });
                           },
                           style: TextButton.styleFrom(
