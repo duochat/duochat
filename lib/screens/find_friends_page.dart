@@ -44,11 +44,11 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 
 	void _updateSearch(String keyword) async {
 
-		_searchCardKeys.forEach((key) => key.currentState.slideOut());
-
 		if(_searchResults.length > 0) {
+			_searchCardKeys.forEach((key) => key.currentState.slideOut());
 			await Future.delayed(Duration(milliseconds: 200));
 		}
+
 		setState(() { _searchResults = []; });
 		await Future.delayed(Duration(milliseconds: 10));
 		setState(() {
@@ -68,10 +68,10 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
   	QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("publicUserInfo").get();
 		_users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
 
-  	setState(() {
-  		_searchResults = [];
-  	  _isSearching = true;
-  	});
+		setState(() {
+			_updateSearch('');
+			_isSearching = true;
+		});
   }
 
   void hideSearchBar() {
