@@ -35,9 +35,29 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Never gonna make you cry</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_dartobservatory._tcp</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Never gonna let you down</string>
+	<key>NSContactsUsageDescription</key>
+	<string>and desert you</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Never gonna run around</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Never gonna say goodbye</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Never gonna give you up</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Never gonna tell a lie</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -56,19 +76,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Never gonna give you up</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Never gonna let you down</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Never gonna run around</string>
-	<key>NSContactsUsageDescription</key>
-	<string>and desert you</string>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>Never gonna make you cry</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Never gonna say goodbye</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Never gonna tell a lie</string>
 </dict>
 </plist>
