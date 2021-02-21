@@ -3,6 +3,7 @@ import 'package:duochat/models.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController nameController;
   TextEditingController usernameController;
+  TextEditingController photoController;
   TextEditingController bioController;
   TextEditingController interestsController;
 
@@ -24,6 +26,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     nameController = new TextEditingController(text: "Loading...");
     usernameController = new TextEditingController(text: "Loading...");
+    photoController = new TextEditingController(text: "Enter photo url here");
     bioController = new TextEditingController(text: "Loading...");
     interestsController = new TextEditingController(text: "Loading...");
 
@@ -112,8 +115,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     SizedBox(height: 16.0),
                     TextFormField(
                       controller: usernameController,
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(vertical: 5),
                         labelText: 'Username',
@@ -164,6 +165,49 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
         ),
       ),
+      floatingActionButton: kDebugMode ? Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+            width: 200,
+            child: TextFormField(
+              controller: photoController,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(vertical: 5),
+                labelText: 'Photo url',
+              ),
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'This field is required.';
+                }
+                return null;
+              },
+            ),
+          ),
+          FloatingActionButton(
+            child: Icon(Icons.add),
+            backgroundColor: Theme.of(context).primaryColor,
+            tooltip: 'Add a new user',
+            onPressed: () {
+              FirebaseFirestore.instance
+                .collection('publicUserInfo')
+                .add({
+                  'name': nameController.text,
+                  'username': usernameController.text,
+                  'bio': bioController.text,
+                  'interests': interestsController.text,
+                  'photoURL': photoController.text,
+                });
+              FirebaseFirestore.instance
+                .collection('privateUserInfo')
+                .add({
+                  'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+                  'finishedOnboarding': false,
+                });
+            },
+          ),
+        ],
+      ) : null,
     );
   }
 }
