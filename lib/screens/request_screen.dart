@@ -341,6 +341,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
     final users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
     
     User firebaseUser = Provider.of<User>(context, listen: false);
+    final requestsData = await PrivateUserData.fromID(firebaseUser.uid);
     final interestsData = await PublicUserData.fromID(firebaseUser.uid);
 
     if(_suggestions.length > 0) {
@@ -353,6 +354,9 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
     setState(() {
       users.forEach((user) {
         if(user.id == firebaseUser.uid) return;
+        if(requestsData.incomingRequests.contains(user.id)
+          || requestsData.outgoingRequests.contains(user.id)
+          || interestsData.connections.contains(user.id)) return;
         final interests = interestsData.interests.toLowerCase().split(new RegExp("[,. /\n]+"));
         for(var interest in user.interests.toLowerCase().split(new RegExp("[,. /\n]+"))) {
           if(interests.contains(interest)) {
@@ -382,7 +386,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
           child: Column(
             children: [
               TopNavBar(
-                title: 'Connection Suggestions',
+                title: 'Suggestions',
                 suffix: CupertinoButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -430,9 +434,9 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                               ),
                             ),
                         contextWidget: OutlinedButton(
-                          child: Icon(Icons.clear),
+                          child: Icon(Icons.add),
                           onPressed: () async {
-                            await DatabaseService.cancelRequest(context, _suggestions[index].id);
+                            await DatabaseService.requestConnection(context, _suggestions[index].id);
                             _refreshIndicatorKey.currentState?.show();
                           },
                           style: OutlinedButton.styleFrom(

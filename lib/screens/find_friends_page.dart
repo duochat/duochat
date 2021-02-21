@@ -161,6 +161,9 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 			_outgoingRequests = requestsData.outgoingRequests.toList();
 			users.forEach((user) {
 				if(user.id == firebaseUser.uid) return;
+				if(requestsData.incomingRequests.contains(user.id)
+					|| requestsData.outgoingRequests.contains(user.id)
+					|| connectionsData.connections.contains(user.id)) return;
 				final interests = connectionsData.interests.toLowerCase().split(new RegExp("[,. /\n]+"));
 				for(var interest in user.interests.toLowerCase().split(new RegExp("[,. /\n]+"))) {
 					if(interests.contains(interest)) {
