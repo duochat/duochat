@@ -21,11 +21,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+   Future<FirebaseApp> _initialization;
 
   MyApp () {
-    PushNotificationsManager notifications = PushNotificationsManager();
-    notifications.init();
+    _initialization  = Firebase.initializeApp();
+    _initialization.whenComplete (() {
+      PushNotificationsManager().init();
+    });
   }
   // This widget is the root of your application.
   @override
