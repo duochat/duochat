@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:duochat/models.dart';
-import 'package:provider/provider.dart';
 
 class ProfileScreenArguments {
   final PublicUserData user;
@@ -43,9 +42,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> updateConnection() async {
-    User firebaseUser = Provider.of<User>(context, listen: false);
-    PublicUserData connectionsData = await PublicUserData.fromID(firebaseUser.uid);
-    PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
+    final myID = FirebaseAuth.instance.currentUser.uid;
+    PublicUserData connectionsData = await PublicUserData.fromID(myID);
+    PrivateUserData requestsData = await PrivateUserData.fromID(myID);
 
     setState(() {
       if(connectionsData.connections.contains(user.id)) {

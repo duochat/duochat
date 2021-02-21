@@ -169,7 +169,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
         ),
       ),
-      // floatingActionButton: kDebugMode ? Row(
+      // floatingActionButton: Row(
       //   mainAxisAlignment: MainAxisAlignment.end,
       //   children: [
       //     Container(
@@ -192,8 +192,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       //       child: Icon(Icons.add),
       //       backgroundColor: Theme.of(context).primaryColor,
       //       tooltip: 'Add a new user',
-      //       onPressed: () {
-      //         FirebaseFirestore.instance
+      //       onPressed: () async {
+      //         final user = await FirebaseFirestore.instance
       //           .collection('publicUserInfo')
       //           .add({
       //             'name': nameController.text,
@@ -201,24 +201,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       //             'bio': bioController.text,
       //             'interests': interestsController.text,
       //             'photoURL': photoController.text,
-      //           }).then((value) {
-      //             FirebaseFirestore.instance
-      //               .collection('publicUserInfo')
-      //               .doc(value.id)
-      //               .update({'id': value.id});
-      //             FirebaseFirestore.instance
-      //               .collection('privateUserInfo')
-      //               .doc(value.id)
-      //               .set({
-      //                 'id': value.id,
-      //                 'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-      //                 'finishedOnboarding': false,
-      //               });
-      //         });
+      //           });
+      //         await FirebaseFirestore.instance
+      //           .collection('publicUserInfo')
+      //           .doc(user.id)
+      //           .update({'id': user.id});
+      //         await FirebaseFirestore.instance
+      //           .collection('privateUserInfo')
+      //           .doc(user.id)
+      //           .set({
+      //             'id': user.id,
+      //             'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+      //             'finishedOnboarding': false,
+      //           });
+      //         Navigator.pop(context);
       //       },
       //     ),
       //   ],
-      // ) : null,
+      // ),
     );
   }
 }

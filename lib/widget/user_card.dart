@@ -44,18 +44,14 @@ class SlideInState extends State<SlideIn> with SingleTickerProviderStateMixin {
   void slideIn() {
     Future.delayed(delay, () {
       _animationController.forward();
-      setState(() {
-        isVisible = true;
-      });
+      setState(() { isVisible = true; });
     });
   }
 
   void slideOut() {
+    setState(() { isVisible = false; });
     Future.delayed(delay, () {
       _animationController.reverse();
-      setState(() {
-        isVisible = false;
-      });
     });
   }
 
@@ -76,9 +72,7 @@ class SlideInState extends State<SlideIn> with SingleTickerProviderStateMixin {
     ));
     Future.delayed(delay, () {
       _animationController.forward();
-      setState(() {
-        isVisible = true;
-      });
+      setState(() { isVisible = true; });
     });
   }
 

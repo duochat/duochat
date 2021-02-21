@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
 
 class FindFriendsPage extends StatefulWidget {
   @override
@@ -32,18 +31,17 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
 	void _updateSearch(String keyword) async {
 
 		if(_searchResults.length > 0) {
-			_searchCardKeys.forEach((key) => key.currentState.slideOut());
+			_searchCardKeys.forEach((key) => key.currentState?.slideOut());
 			await Future.delayed(Duration(milliseconds: 200));
 		}
 
 		setState(() { _searchResults = []; });
 		await Future.delayed(Duration(milliseconds: 10));
 		setState(() {
-			// TODO: replace this with firebase integration
-			_searchResults = _users
-					.where((user) =>
-			user.name.toLowerCase().contains(keyword.toLowerCase()) ||
-					user.username.toLowerCase().contains(keyword.toLowerCase())).toList();
+			_searchResults = _users.where((user) =>
+				user.name.toLowerCase().contains(keyword.toLowerCase()) ||
+				user.username.toLowerCase().contains(keyword.toLowerCase())
+			).toList();
 			_searchCardKeys = List<GlobalKey<SlideInState>>();
 			for(int i = 0; i < _searchResults.length; i++) {
 				_searchCardKeys.add(GlobalKey<SlideInState>());
@@ -55,8 +53,8 @@ class _FindFriendsPageState extends State<FindFriendsPage> {
   	QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("publicUserInfo").get();
 		_users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
 
+		_updateSearch('');
 		setState(() {
-			_updateSearch('');
 			_isSearching = true;
 		});
   }
@@ -138,13 +136,17 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 
 		_userCardKeys.forEach((key) => key.currentState.slideOut());
 
-		User firebaseUser = Provider.of<User>(context, listen: false);
-		PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
-		PublicUserData connectionsData = await PublicUserData.fromID(firebaseUser.uid);
-		QuerySnapshot connectionsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
-				.where('id', whereIn: connectionsData.connections.toList()+['']).get();
-		QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("publicUserInfo").get();
-		final users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+		final myID = FirebaseAuth.instance.currentUser.uid;
+		PrivateUserData requestsData = await PrivateUserData.fromID(myID);
+		PublicUserData connectionsData = await PublicUserData.fromID(myID);
+		QuerySnapshot connectionsSnapshot = await FirebaseFirestore.instance
+				.collection("publicUserInfo")
+				.where('id', whereIn: connectionsData.connections.toList() + [''])
+				.get();
+		QuerySnapshot snapshot = await FirebaseFirestore.instance
+				.collection("publicUserInfo").get();
+		final users = snapshot.docs.map((doc) =>
+				PublicUserData.fromMap(doc.data())).toList();
 
 		if(_connections.length + requestsRowCount() > 0) {
 			await Future.delayed(Duration(milliseconds: 500));
@@ -160,7 +162,7 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 			_incomingRequests = requestsData.incomingRequests.toList();
 			_outgoingRequests = requestsData.outgoingRequests.toList();
 			users.forEach((user) {
-				if(user.id == firebaseUser.uid) return;
+				if(user.id == myID) return;
 				if(requestsData.incomingRequests.contains(user.id)
 					|| requestsData.outgoingRequests.contains(user.id)
 					|| connectionsData.connections.contains(user.id)) return;

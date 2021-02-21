@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:duochat/screens/profile_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RequestsScreenArguments {
@@ -46,8 +45,8 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
 
     _userCardKeys.forEach((key) => key.currentState.slideOut());
 
-    User firebaseUser = Provider.of<User>(context, listen: false);
-    PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
+    final myID = FirebaseAuth.instance.currentUser.uid;
+    PrivateUserData requestsData = await PrivateUserData.fromID(myID);
     QuerySnapshot incomingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
         .where('id', whereIn: requestsData.incomingRequests.toList()+['']).get();
 
@@ -198,8 +197,8 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
 
     _userCardKeys.forEach((key) => key.currentState.slideOut());
 
-    User firebaseUser = Provider.of<User>(context, listen: false);
-    PrivateUserData requestsData = await PrivateUserData.fromID(firebaseUser.uid);
+    final myID = FirebaseAuth.instance.currentUser.uid;
+    PrivateUserData requestsData = await PrivateUserData.fromID(myID);
     QuerySnapshot outgoingRequestsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
         .where('id', whereIn: requestsData.outgoingRequests.toList()+['']).get();
 
@@ -339,10 +338,10 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
     
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("publicUserInfo").get();
     final users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
-    
-    User firebaseUser = Provider.of<User>(context, listen: false);
-    final requestsData = await PrivateUserData.fromID(firebaseUser.uid);
-    final interestsData = await PublicUserData.fromID(firebaseUser.uid);
+
+    final myID = FirebaseAuth.instance.currentUser.uid;
+    final requestsData = await PrivateUserData.fromID(myID);
+    final interestsData = await PublicUserData.fromID(myID);
 
     if(_suggestions.length > 0) {
       await Future.delayed(Duration(milliseconds: 500));
@@ -353,7 +352,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
 
     setState(() {
       users.forEach((user) {
-        if(user.id == firebaseUser.uid) return;
+        if(user.id == myID) return;
         if(requestsData.incomingRequests.contains(user.id)
           || requestsData.outgoingRequests.contains(user.id)
           || interestsData.connections.contains(user.id)) return;
