@@ -302,3 +302,154 @@ class _OutgoingRequestsScreenState extends State<OutgoingRequestsScreen> {
   }
 
 }
+
+
+
+class SuggestionsScreen extends StatefulWidget {
+
+  static String id = 'suggestions_screen';
+
+  @override
+  State<StatefulWidget> createState() => _SuggestionsScreenState();
+}
+class _SuggestionsScreenState extends State<SuggestionsScreen> {
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  List<GlobalKey<SlideInState>> _userCardKeys = [];
+  List<PublicUserData> _suggestions = [];
+  Function refresh;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 0), () {
+      _refreshIndicatorKey.currentState.show();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    refresh();
+  }
+
+  Future<void> _updateSuggestions() async {
+
+    _userCardKeys.forEach((key) => key.currentState.slideOut());
+    
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("publicUserInfo").get();
+    final users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
+    
+    User firebaseUser = Provider.of<User>(context, listen: false);
+    final interestsData = await PublicUserData.fromID(firebaseUser.uid);
+
+    if(_suggestions.length > 0) {
+      await Future.delayed(Duration(milliseconds: 500));
+    }
+
+    setState(() { _suggestions = []; });
+    await Future.delayed(Duration(milliseconds: 10));
+
+    setState(() {
+      users.forEach((user) {
+        if(user.id == firebaseUser.uid) return;
+        final interests = interestsData.interests.toLowerCase().split(new RegExp("[,. /\n]+"));
+        for(var interest in user.interests.toLowerCase().split(new RegExp("[,. /\n]+"))) {
+          if(interests.contains(interest)) {
+            _suggestions.add(user);
+            break;
+          }
+        }
+      });
+      _userCardKeys = List<GlobalKey<SlideInState>>();
+      for(int i = 0; i < _suggestions.length; i++) {
+        _userCardKeys.add(GlobalKey<SlideInState>());
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final RequestsScreenArguments args = ModalRoute.of(context).settings.arguments;
+    refresh = args.refresh;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          color: Colors.white,
+          child: Column(
+            children: [
+              TopNavBar(
+                title: 'Connection Suggestions',
+                suffix: CupertinoButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.arrow_back,
+                        size: 18.0,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      SizedBox(
+                        width: 4.0,
+                      ),
+                      Text(
+                        'Back',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child:  RefreshIndicator(
+                  key: _refreshIndicatorKey,
+                  onRefresh: _updateSuggestions,
+                  child: ListView.builder(
+                    itemCount: _suggestions.length,
+                    itemBuilder: (BuildContext context, int index) => SlideIn(
+                      key: _userCardKeys[index],
+                      delay: Duration(milliseconds: index*50),
+                      child: UserCard(
+                        user: _suggestions[index],
+                        message: _suggestions[index].username,
+                        onTap: () =>
+                            Navigator.pushNamed(
+                              context,
+                              ProfileScreen.id,
+                              arguments: ProfileScreenArguments(
+                                _suggestions[index],
+                                _refreshIndicatorKey.currentState.show,
+                              ),
+                            ),
+                        contextWidget: OutlinedButton(
+                          child: Icon(Icons.clear),
+                          onPressed: () async {
+                            await DatabaseService.cancelRequest(context, _suggestions[index].id);
+                            _refreshIndicatorKey.currentState?.show();
+                          },
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: Size.fromRadius(10),
+                            shape: CircleBorder(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+}

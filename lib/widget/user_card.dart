@@ -123,15 +123,20 @@ class UserCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(top: 5.0, bottom: 5.0, right: 20.0),
+        margin: EdgeInsets.only(right: 20.0),
         padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
         decoration: BoxDecoration(
 //          gradient: LinearGradient(
 //            colors: [const Color(0xFFFFE0B0), const Color(0xFFFFF0D0)],
 //          ),
-          borderRadius: BorderRadius.horizontal(
-            right: Radius.circular(25.0),
-          ),
+
+        // border: Border(
+        //   top: BorderSide(color: Theme.of(context).primaryColor),
+        //   bottom: BorderSide(color: Theme.of(context).primaryColor),
+        // ),
+          // borderRadius: BorderRadius.horizontal(
+          //   right: Radius.circular(25.0),
+          // ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,

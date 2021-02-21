@@ -16,19 +16,6 @@ class FindFriendsPage extends StatefulWidget {
 
 class _FindFriendsPageState extends State<FindFriendsPage> {
 
-	// mock data: [
-	// 		UserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
-	// 		UserData(name: 'Cat', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat'),
-	// 		UserData(name: 'Space Planet', id: '3', photoURL: 'https://i.imgur.com/ftmga3Y.png', username: 'red_planet'),
-	// 		UserData(name: 'Space Galaxy', id: '4', photoURL: 'https://i.imgur.com/drDF2xB.jpg', username: 'milkyway'),
-	// 		UserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
-	// 		UserData(name: 'Dino', id: '6', photoURL: 'https://i.imgur.com/Vaoll5X.png', username: 'Dio'),
-	// 	][
-	// 	PublicUserData(name: 'Kitty', id: '1', photoURL: 'https://i.imgur.com/O9z1hcx.png', username: 'ghost_cat'),
-	// 	PublicUserData(name: 'Cat with a name so long the card expands (should this be legal?) also you can\'t see the username anymore lol', id: '2', photoURL: 'https://i.imgur.com/UYcL5sl.jpg', username: 'paint_cat_with_a_really_super_long_username'),
-	// 	PublicUserData(name: 'Random Girl', id: '5', photoURL: 'https://i.imgur.com/6xFjIVa.jpg', username: 'commonapp_girl'),
-	// 	]
-
 	List<GlobalKey<SlideInState>> _searchCardKeys = [];
 	final FocusNode searchBarFocusNode = FocusNode();
 
@@ -136,6 +123,7 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 
 	List<String> _incomingRequests = [];
 	List<String> _outgoingRequests = [];
+	List<String> _connectionSuggestions = [];
 	List<PublicUserData> _connections = [];
 
 	@override
@@ -155,6 +143,8 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 		PublicUserData connectionsData = await PublicUserData.fromID(firebaseUser.uid);
 		QuerySnapshot connectionsSnapshot = await FirebaseFirestore.instance.collection("publicUserInfo")
 				.where('id', whereIn: connectionsData.connections.toList()+['']).get();
+		QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("publicUserInfo").get();
+		final users = snapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
 
 		if(_connections.length + requestsRowCount() > 0) {
 			await Future.delayed(Duration(milliseconds: 500));
@@ -162,12 +152,23 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 		setState(() {
 			_incomingRequests = [];
 			_outgoingRequests = [];
+			_connectionSuggestions = [];
 			_connections = [];
 		});
 		await Future.delayed(Duration(milliseconds: 10));
 		setState(() {
 			_incomingRequests = requestsData.incomingRequests.toList();
 			_outgoingRequests = requestsData.outgoingRequests.toList();
+			users.forEach((user) {
+				if(user.id == firebaseUser.uid) return;
+				final interests = connectionsData.interests.toLowerCase().split(new RegExp("[,. /\n]+"));
+				for(var interest in user.interests.toLowerCase().split(new RegExp("[,. /\n]+"))) {
+					if(interests.contains(interest)) {
+						_connectionSuggestions.add(user.id);
+						break;
+					}
+				}
+			});
 			_connections = connectionsSnapshot.docs.map((doc) => PublicUserData.fromMap(doc.data())).toList();
 			_userCardKeys = List<GlobalKey<SlideInState>>();
 			for(int i = 0; i < _connections.length + requestsRowCount(); i++) {
@@ -177,7 +178,9 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 	}
 
   int requestsRowCount() =>
-			(_incomingRequests.isEmpty ? 0 : 1) + (_outgoingRequests.isEmpty ? 0 : 1);
+		(_incomingRequests.isEmpty ? 0 : 1) +
+		(_outgoingRequests.isEmpty ? 0 : 1) +
+		(_connectionSuggestions.isEmpty ? 0 : 1);
 
 	@override
 	Widget build(BuildContext context) {
@@ -211,8 +214,8 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 							);
 						}
 						if (((index == 0 && _incomingRequests.isEmpty)
-								|| (index == 1 && _incomingRequests.isNotEmpty))
-										&& _outgoingRequests.isNotEmpty) {
+							|| (index == 1 && _incomingRequests.isNotEmpty))
+							&& _outgoingRequests.isNotEmpty) {
 							return SlideIn(
 								key: _userCardKeys[index],
 								delay: Duration(milliseconds: index*50),
@@ -227,6 +230,30 @@ class _ConnectionsListState extends State<_ConnectionsList> {
 									onTap: () => Navigator.pushNamed(
 										context,
 										OutgoingRequestsScreen.id,
+										arguments: RequestsScreenArguments(
+											_refreshIndicatorKey.currentState.show,
+										),
+									),
+								),
+							);
+						}
+						if (((index == 0 && requestsRowCount() == 1)
+							|| (index == 1 && requestsRowCount() == 2)
+							|| (index == 2 && requestsRowCount() == 3))
+								&& _connectionSuggestions.isNotEmpty) {
+							return SlideIn(
+								key: _userCardKeys[index],
+								delay: Duration(milliseconds: index*50),
+								child: UserCard(
+									user: PublicUserData(
+										name: '${_connectionSuggestions
+												.length} Connection Suggestion${_connectionSuggestions
+												.length > 1 ? 's' : ''}',
+									),
+									contextWidget: Icon(Icons.arrow_forward_ios_rounded),
+									onTap: () => Navigator.pushNamed(
+										context,
+										SuggestionsScreen.id,
 										arguments: RequestsScreenArguments(
 											_refreshIndicatorKey.currentState.show,
 										),

@@ -94,6 +94,7 @@ class MyApp extends StatelessWidget {
               ProfileScreen.id: (context) => ProfileScreen(),
               IncomingRequestsScreen.id: (context) => IncomingRequestsScreen(),
               OutgoingRequestsScreen.id: (context) => OutgoingRequestsScreen(),
+              SuggestionsScreen.id: (context) => SuggestionsScreen(),
             },
           ),
         );
