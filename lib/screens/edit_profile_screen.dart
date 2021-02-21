@@ -3,6 +3,7 @@ import 'package:duochat/models.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -91,74 +92,76 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
             ),
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      TextFormField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 5),
-                          labelText: 'Name',
+            Expanded(
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        TextFormField(
+                          controller: nameController,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 5),
+                            labelText: 'Name',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'This field is required.';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'This field is required.';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 16.0),
-                      TextFormField(
-                        controller: usernameController,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 5),
-                          labelText: 'Username',
+                        SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: usernameController,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 5),
+                            labelText: 'Username',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'This field is required.';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'This field is required.';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 16.0),
-                      TextFormField(
-                        controller: bioController,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 5),
-                          labelText: 'Bio',
+                        SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: bioController,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 5),
+                            labelText: 'Bio',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'This field is required.';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'This field is required.';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 16.0),
-                      TextFormField(
-                        controller: interestsController,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 5),
-                          labelText: 'Career Interests',
+                        SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: interestsController,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 5),
+                            labelText: 'Career Interests',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Adding career interests improves connection results!';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Adding career interests improves connection results!';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
