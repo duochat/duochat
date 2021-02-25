@@ -1,16 +1,16 @@
-# duochat
+# DuoChat
 
-A new Flutter project.
+Duochat is a new professional social media app targeted especially at aspiring entrepreneurs in high school that takes a fresh approach to professional networking.
+We actively seeks to help users expand their network and make new meaningful connections with people they haven’t met before.
 
-## Getting Started
+## Developing
+DuoChat uses flutter, an open-source UI software development kit by Google that allows us to rapidly develop beautiful cross-platform applications.
 
-This project is a starting point for a Flutter application.
+To run the app locally, [install flutter](https://flutter.dev/docs/get-started/install), then install the dependencies with `flutter pub get` and run the app on a local simulator or connected device with `flutter run`.
 
-A few resources to get you started if this is your first Flutter project:
+## Open Source Software
+DuoChat is made possible by numerous open source libraries and tools, including: 
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Firebase
+- Flutter
+- 
