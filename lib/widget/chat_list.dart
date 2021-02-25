@@ -47,9 +47,9 @@ class ChatList extends StatelessWidget {
                     } else {
                       time = DateFormat('jm').format(messages.last.timestamp);
                       if (messages.last.text != null) {
-                        text = messages.last.text;
+                        text = '${messages.last.sender.name.split(" ")[0]}: ${messages.last.text}';
                       } else if (messages.last.imageURL != null) {
-                        text = '[${messages.last.sender.name} sent an image]';
+                        text = '[${messages.last.sender.name.split(" ")[0]} sent an image]';
                       } else {
                         text = 'Say hi to ${chat.name}!';
                       }
