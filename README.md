@@ -8,8 +8,8 @@ DuoChat uses flutter, an open-source UI software development kit by Google that 
 
 #### How to run the app
 To run the app locally, follow these steps.
-1. [install flutter](https://flutter.dev/docs/get-started/install)
-2. nstall the dependencies by running `flutter pub get` in a command line
+1. [Install flutter](https://flutter.dev/docs/get-started/install)
+2. Install the dependencies by running `flutter pub get` in a command line
 3. Open up a local simulator or connect your phone to your computer, then run `flutter run` to launch the application.
 
 The source code for this application can be found in the `lib/` directory.
