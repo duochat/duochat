@@ -14,7 +14,7 @@ To run the app locally, follow these steps.
 
 The source code for this application can be found in the `lib/` directory.
 
-## Open Source Software Licenses
+## Open Source Software and Licenses
 DuoChat is made possible by numerous open source libraries and tools, including: 
 
 - Firebase
@@ -22,6 +22,7 @@ DuoChat is made possible by numerous open source libraries and tools, including:
 - Dart
 
 **Firebase**
+
 Copyright 2021 Google
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,6 +66,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **Dart**
+
 Copyright 2012, the Dart project authors.
 
 Redistribution and use in source and binary forms, with or without
