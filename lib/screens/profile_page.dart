@@ -20,134 +20,126 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    User firebaseUser = Provider.of<User>(context);
+    PublicUserData userData = Provider.of<PublicUserData>(context);
 
-    if (firebaseUser == null) {
+    if (userData == null) {
       return Container();
     }
 
-    return StreamBuilder<PublicUserData>(
-      stream: db.streamPublicUserData(firebaseUser.uid),
-      builder: (context, snapshot) {
-        PublicUserData data = snapshot.data;
-        if (data == null) return Container();
-
-        return Scaffold(
-          backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Container(
-              width: double.infinity,
-              color: Colors.white,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  TopNavBar(
-                    image: NetworkImage(data.photoURL),
-                    title: 'Profile',
-                    suffix: CupertinoButton(
-                      onPressed: () {
-                        FirebaseAuth.instance.signOut();
-                        Navigator.pushReplacementNamed(context, LoginScreen.id);
-                      },
-                      child: Text(
-                        'Logout',
-                        style: TextStyle(color: Colors.black87),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              TopNavBar(
+                image: NetworkImage(userData.photoURL),
+                title: 'Profile',
+                suffix: CupertinoButton(
+                  onPressed: () {
+                    FirebaseAuth.instance.signOut();
+                    Navigator.pushReplacementNamed(context, LoginScreen.id);
+                  },
+                  child: Text(
+                    'Logout',
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                ),
+              ),
+              SizedBox(height: 15.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      alignment: Alignment.center,
+                      child: Stack(
+                        children: <Widget>[
+                          QrImage(
+                            data: userData.username,
+                            version: QrVersions.auto,
+                            errorCorrectionLevel: QrErrorCorrectLevel.H,
+                            size: 200,
+                            gapless: true,
+                          ),
+                          Positioned.fill(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                padding: EdgeInsets.all(3.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: CircleAvatar(
+                                  radius: 28.0,
+                                  backgroundImage:
+                                      NetworkImage(userData.photoURL),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 15.0),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          alignment: Alignment.center,
-                          child: Stack(
-                            children: <Widget>[
-                              QrImage(
-                                data: data.username,
-                                version: QrVersions.auto,
-                                errorCorrectionLevel: QrErrorCorrectLevel.H,
-                                size: 200,
-                                gapless: true,
-                              ),
-                              Positioned.fill(
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    padding: EdgeInsets.all(3.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 28.0,
-                                      backgroundImage:
-                                          NetworkImage(data.photoURL),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 24.0),
-                        Text(
-                          data.name,
-                          style: TextStyle(
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 12.0),
-                        Text(
-                          "User Bio",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                        Text(
-                          data.bio,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        SizedBox(height: 12.0),
-                        Text(
-                          "Career Interests",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                        Text(
-                          data.interests,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
+                    SizedBox(height: 24.0),
+                    Text(
+                      userData.name,
+                      style: TextStyle(
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 12.0),
+                    Text(
+                      "User Bio",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    Text(
+                      userData.bio,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 12.0),
+                    Text(
+                      "Career Interests",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    Text(
+                      userData.interests,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.pushNamed(context, EditProfileScreen.id);
-            },
-            child: Icon(Icons.edit),
-            backgroundColor: Theme.of(context).primaryColor,
-          ),
-        );
-      },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, EditProfileScreen.id);
+        },
+        child: Icon(Icons.edit),
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
     );
   }
 }

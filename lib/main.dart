@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:duochat/models.dart';
+import "package:duochat/push_notifications.dart";
 import 'package:duochat/screens/answer_prompt_screen.dart';
 import 'package:duochat/screens/chat_screen.dart';
 import 'package:duochat/screens/edit_profile_screen.dart';
@@ -5,15 +8,15 @@ import 'package:duochat/screens/home_screen_container.dart';
 import 'package:duochat/screens/login_screen.dart';
 import 'package:duochat/screens/onboarding_screen.dart';
 import 'package:duochat/screens/profile_screen.dart';
+import 'package:duochat/screens/request_screen.dart';
 import 'package:duochat/screens/scan_qr_screen.dart';
 import 'package:duochat/screens/support_screen.dart';
 import 'package:duochat/widget/loading.dart';
-import 'package:duochat/screens/request_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import "package:duochat/push_notifications.dart";
+import 'package:stream_transform/stream_transform.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,11 +24,11 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-   Future<FirebaseApp> _initialization;
+  Future<FirebaseApp> _initialization;
 
-  MyApp () {
-    _initialization  = Firebase.initializeApp();
-    _initialization.whenComplete (() {
+  MyApp() {
+    _initialization = Firebase.initializeApp();
+    _initialization.whenComplete(() {
       PushNotificationsManager().init();
     });
   }
@@ -43,8 +46,14 @@ class MyApp extends StatelessWidget {
         }
         return MultiProvider(
           providers: [
-            StreamProvider<User>.value(
-              value: FirebaseAuth.instance.authStateChanges(),
+            StreamProvider<PublicUserData>.value(
+              value: FirebaseAuth.instance.authStateChanges().switchMap(
+                  (event) => FirebaseFirestore.instance
+                      .collection('publicUserInfo')
+                      .doc(event.uid)
+                      .snapshots()
+                      .map((event) => PublicUserData.fromMap(event.data()))),
+              initialData: null,
             ),
           ],
           child: MaterialApp(
@@ -63,19 +72,22 @@ class MyApp extends StatelessWidget {
               backgroundColor: Colors.white,
               canvasColor: Colors.white,
               primaryColor: Color(0xFFFF7A00),
-              textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(
+              textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
                 primary: Colors.white,
                 backgroundColor: Colors.orange,
                 padding: EdgeInsets.all(10),
                 shape: StadiumBorder(),
               )),
-              outlinedButtonTheme: OutlinedButtonThemeData(style: OutlinedButton.styleFrom(
-                primary: Colors.orange,
-                backgroundColor: Colors.white,
-                side: BorderSide(color: Colors.orange),
-                padding: EdgeInsets.all(10),
-                shape: StadiumBorder(),
-              ),),
+              outlinedButtonTheme: OutlinedButtonThemeData(
+                style: OutlinedButton.styleFrom(
+                  primary: Colors.orange,
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.orange),
+                  padding: EdgeInsets.all(10),
+                  shape: StadiumBorder(),
+                ),
+              ),
               // This makes the visual density adapt to the platform that you run
               // the app on. For desktop platforms, the controls will be smaller and
               // closer together (more dense) than on mobile platforms.
