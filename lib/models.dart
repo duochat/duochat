@@ -164,16 +164,25 @@ class ChatMessage {
   final ChatMessageSender sender;
   final String text;
   final String imageURL;
+  final ConversationPrompt conversationPrompt;
   final DateTime timestamp;
   final List<ChatMessageReadByUser> readBy;
 
   ChatMessage(
-      {this.sender, this.text, this.imageURL, this.timestamp, this.readBy});
+      {this.sender,
+      this.text,
+      this.imageURL,
+      this.conversationPrompt,
+      this.timestamp,
+      this.readBy});
   factory ChatMessage.fromMap(Map data) {
     return ChatMessage(
       sender: ChatMessageSender.fromMap(data['sender']),
       text: data['text'],
       imageURL: data['imageURL'],
+      conversationPrompt: data['conversationPrompt'] == null
+          ? null
+          : ConversationPrompt.fromMap(data['conversationPrompt']),
       timestamp: DateTime.fromMillisecondsSinceEpoch(data['timestamp']),
       readBy: data['readBy']
           .map<ChatMessageReadByUser>((el) => ChatMessageReadByUser.fromMap(el))
@@ -185,6 +194,7 @@ class ChatMessage {
       "sender": sender.toMap(),
       "text": text,
       "imageURL": imageURL,
+      "conversationPrompt": conversationPrompt.toMap(),
       "timestamp": timestamp.millisecondsSinceEpoch,
       "readBy": readBy.map((el) => el.toMap()).toList()
     };
@@ -193,6 +203,18 @@ class ChatMessage {
 
 class ConversationPrompt {
   final String prompt;
+  final Map<String, String> responses;
 
-  ConversationPrompt(this.prompt);
+  ConversationPrompt({this.prompt, this.responses});
+
+  factory ConversationPrompt.fromMap(Map data) {
+    return ConversationPrompt(
+        prompt: data['prompt'], responses: data['responses']);
+  }
+  toMap() {
+    return {
+      "prompt": prompt,
+      "responses": responses,
+    };
+  }
 }

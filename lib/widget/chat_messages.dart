@@ -26,15 +26,7 @@ class _ChatMessagesState extends State<ChatMessages> {
       itemCount: widget.messages.length,
       itemBuilder: (BuildContext context, int reversedIndex) {
         int index = widget.messages.length - 1 - reversedIndex;
-        if (widget.messages[index] is ConversationPrompt) {
-          // legacy code, we don't have convo prompts anymore
-          return ConversationPromptMessage(
-            prompt: widget.messages[index],
-            onTap: (ConversationPrompt prompt) {
-              print("Prompt tapped: " + prompt.prompt);
-            },
-          );
-        } else if (widget.messages[index] is ChatMessage) {
+        if (widget.messages[index] is ChatMessage) {
           final ChatMessage msg = widget.messages[index];
           return buildChatMessage(context, msg);
         } else {
@@ -44,7 +36,13 @@ class _ChatMessagesState extends State<ChatMessages> {
     );
   }
 
-  Align buildChatMessage(BuildContext context, ChatMessage msg) {
+  Widget buildChatMessage(BuildContext context, ChatMessage msg) {
+    if (msg.conversationPrompt != null) {
+      return ConversationPromptMessage(
+        prompt: msg.conversationPrompt,
+      );
+    }
+
     final String userId = FirebaseAuth.instance.currentUser.uid;
     final bool isUser = userId == msg.sender.id;
     return Align(

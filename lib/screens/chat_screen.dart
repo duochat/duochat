@@ -11,6 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../models.dart';
 
@@ -118,24 +119,28 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void handleChatMessageSubmit(String chatId) {
-
-    if(myController.text.trim() == '') {
+    if (myController.text.trim() == '') {
       myFocusNode.requestFocus();
       return;
     }
 
-    print("send " + myController.text + " " + chatId);
     final String text = myController.text;
 
-    PublicUserData.fromID(FirebaseAuth.instance.currentUser.uid)
-        .then((PublicUserData currentUser) {
+    PublicUserData currentUser =
+        Provider.of<PublicUserData>(context, listen: false);
+
+    if (text == "prompt") {
+      // temporary handling
+
       ChatMessage message = ChatMessage(
         sender: ChatMessageSender(
           name: currentUser.name,
           id: currentUser.id,
           photoURL: currentUser.photoURL,
         ),
-        text: text,
+        conversationPrompt: ConversationPrompt(
+          prompt: "What's your most memorable memory?",
+        ),
         timestamp: DateTime.now(),
         readBy: [ChatMessageReadByUser(name: "dfas", id: "sadf")],
       );
@@ -146,7 +151,28 @@ class _ChatScreenState extends State<ChatScreen> {
           .child("messages")
           .push()
           .set(message.toMap());
-    });
+
+      myController.clear();
+      return;
+    }
+
+    ChatMessage message = ChatMessage(
+      sender: ChatMessageSender(
+        name: currentUser.name,
+        id: currentUser.id,
+        photoURL: currentUser.photoURL,
+      ),
+      text: text,
+      timestamp: DateTime.now(),
+      readBy: [ChatMessageReadByUser(name: "dfas", id: "sadf")],
+    );
+    FirebaseDatabase.instance
+        .reference()
+        .child('chats')
+        .child(chatId)
+        .child("messages")
+        .push()
+        .set(message.toMap());
 
     myController.clear();
   }
@@ -249,7 +275,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: CupertinoTextField(
                       controller: myController,
                       focusNode: myFocusNode,
-                      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                      padding: EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 12.0),
                       placeholder: "Message here...",
                       decoration: BoxDecoration(
                         color: Color(0xFFF6F6F6),

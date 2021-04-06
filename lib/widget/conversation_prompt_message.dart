@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 
 class ConversationPromptMessage extends StatelessWidget {
   final ConversationPrompt prompt;
-  final Function onTap;
 
-  const ConversationPromptMessage({this.prompt, this.onTap});
+  const ConversationPromptMessage({this.prompt});
 
   @override
   Widget build(BuildContext context) {
