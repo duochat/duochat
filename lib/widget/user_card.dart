@@ -44,12 +44,16 @@ class SlideInState extends State<SlideIn> with SingleTickerProviderStateMixin {
   void slideIn() {
     Future.delayed(delay, () {
       _animationController.forward();
-      setState(() { isVisible = true; });
+      setState(() {
+        isVisible = true;
+      });
     });
   }
 
   void slideOut() {
-    setState(() { isVisible = false; });
+    setState(() {
+      isVisible = false;
+    });
     Future.delayed(delay, () {
       _animationController.reverse();
     });
@@ -72,7 +76,9 @@ class SlideInState extends State<SlideIn> with SingleTickerProviderStateMixin {
     ));
     Future.delayed(delay, () {
       _animationController.forward();
-      setState(() { isVisible = true; });
+      setState(() {
+        isVisible = true;
+      });
     });
   }
 
@@ -124,14 +130,14 @@ class UserCard extends StatelessWidget {
 //            colors: [const Color(0xFFFFE0B0), const Color(0xFFFFF0D0)],
 //          ),
 
-        // border: Border(
-        //   top: BorderSide(color: Theme.of(context).primaryColor),
-        //   bottom: BorderSide(color: Theme.of(context).primaryColor),
-        // ),
-          // borderRadius: BorderRadius.horizontal(
-          //   right: Radius.circular(25.0),
-          // ),
-        ),
+            // border: Border(
+            //   top: BorderSide(color: Theme.of(context).primaryColor),
+            //   bottom: BorderSide(color: Theme.of(context).primaryColor),
+            // ),
+            // borderRadius: BorderRadius.horizontal(
+            //   right: Radius.circular(25.0),
+            // ),
+            ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -139,7 +145,7 @@ class UserCard extends StatelessWidget {
             user.photoURL != null
                 ? Container(
                     child: CircleAvatar(
-                      radius: 35.0,
+                      radius: 25.0,
                       backgroundImage: NetworkImage(user.photoURL),
                     ),
                     padding: EdgeInsets.all(3.0),
@@ -163,21 +169,19 @@ class UserCard extends StatelessWidget {
                   Text(
                     user.name,
                     style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade700,
+                      fontSize: 16.0,
                     ),
                   ),
+                  SizedBox(height: 3),
                   message != ''
                       ? Container(
                           //width: MediaQuery.of(context).size.width - 210,
                           child: Text(
                             message,
-                            maxLines: 2,
                             style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                              fontSize: 14.0,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),

@@ -115,15 +115,13 @@ class Chat {
   final String name;
   final String id;
   final String photoURL;
-  List<ChatMessage> messages;
 
-  Chat({this.name, this.id, this.photoURL, this.messages});
+  Chat({this.name, this.id, this.photoURL});
   factory Chat.fromMap(Map data) {
     return Chat(
       name: data['name'] ?? '',
       photoURL: data['photoURL'] ?? '',
       id: data['id'] ?? '',
-      messages: data['messages'].map((msg) => ChatMessage.fromMap(msg)) ?? '',
     );
   }
 }

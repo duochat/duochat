@@ -1,5 +1,6 @@
 import 'package:duochat/screens/chat_screen.dart';
 import 'package:duochat/widget/user_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -27,11 +28,21 @@ class ChatList extends StatelessWidget {
                     .child('chats')
                     .child(chat.id)
                     .child("messages")
+                    .limitToLast(1)
                     .onValue,
                 builder: (context, snapshot) {
                   String text = "Loading...";
                   String time = "";
                   bool isNew = false;
+
+                  String getSenderName(ChatMessageSender sender) {
+                    bool isCurrentUser =
+                        sender.id == FirebaseAuth.instance.currentUser.uid;
+                    if (isCurrentUser) {
+                      return "You";
+                    }
+                    return sender.name.split(" ")[0];
+                  }
 
                   if (snapshot.hasData) {
                     List<ChatMessage> messages =
@@ -47,9 +58,11 @@ class ChatList extends StatelessWidget {
                     } else {
                       time = DateFormat('jm').format(messages.last.timestamp);
                       if (messages.last.text != null) {
-                        text = '${messages.last.sender.name.split(" ")[0]}: ${messages.last.text}';
+                        text =
+                            '${getSenderName(messages.last.sender)}: ${messages.last.text}';
                       } else if (messages.last.imageURL != null) {
-                        text = '[${messages.last.sender.name.split(" ")[0]} sent an image]';
+                        text =
+                            '[${getSenderName(messages.last.sender)} sent an image]';
                       } else {
                         text = 'Say hi to ${chat.name}!';
                       }
@@ -61,7 +74,7 @@ class ChatList extends StatelessWidget {
                       name: chat.name,
                       photoURL: chat.photoURL,
                     ),
-                    message: text,
+                    message: text + (time != "" ? " · " + time : ""),
                     onTap: () => Navigator.pushNamed(
                       context,
                       ChatScreen.id,
@@ -70,7 +83,6 @@ class ChatList extends StatelessWidget {
                     contextWidget: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
-                        Text(time),
                         if (isNew)
                           SizedBox(
                             height: 5.0,

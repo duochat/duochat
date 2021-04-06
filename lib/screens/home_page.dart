@@ -7,6 +7,7 @@ import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,9 +15,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
+    PublicUserData userData = Provider.of<PublicUserData>(context);
+
+    if (userData == null) {
+      return Container();
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -39,41 +45,29 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            StreamBuilder<PublicUserData>(
+            StreamBuilder<List<PublicUserData>>(
                 stream: FirebaseFirestore.instance
                     .collection('publicUserInfo')
-                    .doc(FirebaseAuth.instance.currentUser.uid)
+                    .where('id', whereIn: userData.connections.toList() + [''])
                     .snapshots()
-                    .map((event) => PublicUserData.fromMap(event.data())),
+                    .map((snap) => snap.docs
+                        .map((doc) => PublicUserData.fromMap(doc.data()))
+                        .toList()),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) return Loading();
-                  return StreamBuilder<List<PublicUserData>>(
-                      stream: FirebaseFirestore.instance
-                          .collection('publicUserInfo')
-                          .where('id',
-                              whereIn:
-                                  snapshot.data.connections.toList() + [''])
-                          .snapshots()
-                          .map((snap) => snap.docs
-                              .map((doc) => PublicUserData.fromMap(doc.data()))
-                              .toList()),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) return Loading();
-                        return ChatList(
-                            chats: snapshot.data.map((PublicUserData user) {
-                          List<String> ids = [
-                            FirebaseAuth.instance.currentUser.uid,
-                            user.id
-                          ];
-                          ids.sort();
-                          return Chat(
-                            name: user.name,
-                            id: ids.join('-'),
-                            photoURL: user.photoURL,
-                            messages: <ChatMessage>[],
-                          );
-                        }).toList());
-                      });
+                  return ChatList(
+                      chats: snapshot.data.map((PublicUserData user) {
+                    List<String> ids = [
+                      FirebaseAuth.instance.currentUser.uid,
+                      user.id
+                    ];
+                    ids.sort();
+                    return Chat(
+                      name: user.name,
+                      id: ids.join('-'),
+                      photoURL: user.photoURL,
+                    );
+                  }).toList());
                 }),
           ],
         ),
