@@ -1,13 +1,15 @@
 import 'package:duochat/models.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AnswerPromptScreenArguments {
-  final ConversationPrompt prompt;
+  final ChatMessage message;
+  final Chat chat;
 
-  AnswerPromptScreenArguments(this.prompt);
+  AnswerPromptScreenArguments(this.message, this.chat);
 }
 
 class AnswerPromptScreen extends StatefulWidget {
@@ -18,13 +20,15 @@ class AnswerPromptScreen extends StatefulWidget {
 }
 
 class _AnswerPromptScreenState extends State<AnswerPromptScreen> {
+  final myController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final AnswerPromptScreenArguments args =
         ModalRoute.of(context).settings.arguments;
 
-    Chat chat = Provider.of<Chat>(context, listen: false);
-    ConversationPrompt prompt = args.prompt;
+    Chat chat = args.chat;
+    ConversationPrompt prompt = args.message.conversationPrompt;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -80,6 +84,7 @@ class _AnswerPromptScreenState extends State<AnswerPromptScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: TextField(
+                  controller: myController,
                   expands: true,
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
@@ -110,5 +115,28 @@ class _AnswerPromptScreenState extends State<AnswerPromptScreen> {
     );
   }
 
-  void handlePromptAnswer() {}
+  void handlePromptAnswer() {
+    final PublicUserData user = context.read<PublicUserData>();
+    final AnswerPromptScreenArguments args =
+        ModalRoute.of(context).settings.arguments;
+
+    Chat chat = args.chat;
+    ChatMessage message = args.message;
+
+    String response = myController.text;
+
+    FirebaseDatabase.instance
+        .reference()
+        .child('chats')
+        .child(chat.id)
+        .child("messages")
+        .child(message.id)
+        .child("conversationPrompt")
+        .child("responses")
+        .child(user.id)
+        .set(response)
+        .then((value) {
+      Navigator.pop(context);
+    });
+  }
 }

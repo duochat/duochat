@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:duochat/main.dart';
 import 'package:duochat/widget/chat_messages.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,7 +23,6 @@ class ChatScreenArguments {
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
-  static const String routeId = '${chatRoutePrefix}chat_screen';
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -181,132 +179,136 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Chat chat = Provider.of<Chat>(context);
+    final ChatScreenArguments args = ModalRoute.of(context).settings.arguments;
+    final chatId = args.chat.id;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            TopNavBar(
-              image: NetworkImage(chat.photoURL),
-              title: chat.name,
-              suffix: CupertinoButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      Icons.arrow_back,
-                      size: 18.0,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    SizedBox(
-                      width: 4.0,
-                    ),
-                    Text(
-                      'Back',
-                      style: TextStyle(
-                        fontSize: 18.0,
+    return MultiProvider(
+      providers: [Provider(create: (_) => args.chat)],
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Column(
+            children: <Widget>[
+              TopNavBar(
+                image: NetworkImage(args.chat.photoURL),
+                title: args.chat.name,
+                suffix: CupertinoButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.arrow_back,
+                        size: 18.0,
                         color: Theme.of(context).primaryColor,
                       ),
+                      SizedBox(
+                        width: 4.0,
+                      ),
+                      Text(
+                        'Back',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Flexible(
+                child: StreamBuilder(
+                  stream: FirebaseDatabase.instance
+                      .reference()
+                      .child('chats')
+                      .child(chatId)
+                      .child("messages")
+                      .onValue,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData)
+                      return Container(
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).primaryColor),
+                          ),
+                        ),
+                      );
+
+                    List<ChatMessage> messages =
+                        (snapshot.data.snapshot.value ?? {})
+                            .entries
+                            .map<ChatMessage>(
+                                (entry) => ChatMessage.fromMapEntry(entry))
+                            .toList();
+                    messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+                    return NotificationListener<ScrollStartNotification>(
+                      child: ChatMessages(messages: messages),
+                      onNotification: (notification) {
+                        myFocusNode.unfocus();
+                        return true;
+                      },
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: [
+                    CupertinoButton(
+                      child: Icon(Icons.image),
+                      color: Colors.grey.shade500,
+                      borderRadius: BorderRadius.all(Radius.circular(100.0)),
+                      onPressed: () async {
+                        print("Send Image");
+                        await chooseFile();
+                        print("chosen");
+                        await uploadFile(chatId);
+                        print("upload");
+                      },
+                      padding: EdgeInsets.all(8.0),
+                      minSize: 34.0,
+                    ),
+                    SizedBox(width: 5),
+                    Expanded(
+                      child: CupertinoTextField(
+                        controller: myController,
+                        focusNode: myFocusNode,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 12.0),
+                        placeholder: "Message here...",
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF6F6F6),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(100.0),
+                          ),
+                          border: Border.all(color: Color(0xFFE8E8E8)),
+                        ),
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: (result) {
+                          handleChatMessageSubmit(chatId);
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    CupertinoButton(
+                      child: Icon(Icons.arrow_upward),
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.all(Radius.circular(100.0)),
+                      onPressed: () {
+                        handleChatMessageSubmit(chatId);
+                      },
+                      padding: EdgeInsets.all(8.0),
+                      minSize: 34.0,
                     ),
                   ],
                 ),
               ),
-            ),
-            Flexible(
-              child: StreamBuilder(
-                stream: FirebaseDatabase.instance
-                    .reference()
-                    .child('chats')
-                    .child(chat.id)
-                    .child("messages")
-                    .onValue,
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData)
-                    return Container(
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).primaryColor),
-                        ),
-                      ),
-                    );
-
-                  List<ChatMessage> messages =
-                      (snapshot.data.snapshot.value ?? {})
-                          .values
-                          .map<ChatMessage>(
-                              (message) => ChatMessage.fromMap(message))
-                          .toList();
-                  messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-                  return NotificationListener<ScrollStartNotification>(
-                    child: ChatMessages(messages: messages),
-                    onNotification: (notification) {
-                      myFocusNode.unfocus();
-                      return true;
-                    },
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  CupertinoButton(
-                    child: Icon(Icons.image),
-                    color: Colors.grey.shade500,
-                    borderRadius: BorderRadius.all(Radius.circular(100.0)),
-                    onPressed: () async {
-                      print("Send Image");
-                      await chooseFile();
-                      print("chosen");
-                      await uploadFile(chat.id);
-                      print("upload");
-                    },
-                    padding: EdgeInsets.all(8.0),
-                    minSize: 34.0,
-                  ),
-                  SizedBox(width: 5),
-                  Expanded(
-                    child: CupertinoTextField(
-                      controller: myController,
-                      focusNode: myFocusNode,
-                      padding: EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 12.0),
-                      placeholder: "Message here...",
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF6F6F6),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(100.0),
-                        ),
-                        border: Border.all(color: Color(0xFFE8E8E8)),
-                      ),
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (result) {
-                        handleChatMessageSubmit(chat.id);
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 5),
-                  CupertinoButton(
-                    child: Icon(Icons.arrow_upward),
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(100.0)),
-                    onPressed: () {
-                      handleChatMessageSubmit(chat.id);
-                    },
-                    padding: EdgeInsets.all(8.0),
-                    minSize: 34.0,
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

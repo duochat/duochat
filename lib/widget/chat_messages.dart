@@ -38,7 +38,7 @@ class _ChatMessagesState extends State<ChatMessages> {
   Widget buildChatMessage(BuildContext context, ChatMessage msg) {
     if (msg.conversationPrompt != null) {
       return ConversationPromptMessage(
-        prompt: msg.conversationPrompt,
+        message: msg,
       );
     }
 

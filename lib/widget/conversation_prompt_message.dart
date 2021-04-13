@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ConversationPromptMessage extends StatelessWidget {
-  final ConversationPrompt prompt;
+  final ChatMessage message;
 
-  const ConversationPromptMessage({this.prompt});
+  const ConversationPromptMessage({this.message});
 
   Widget buildUserIcon(String photoURL, bool answeredPrompt) {
     return Container(
@@ -55,7 +55,7 @@ class ConversationPromptMessage extends StatelessWidget {
         Navigator.pushNamed(
           context,
           AnswerPromptScreen.id,
-          arguments: AnswerPromptScreenArguments(this.prompt),
+          arguments: AnswerPromptScreenArguments(this.message, chat),
         );
       },
       child: Container(
@@ -68,7 +68,7 @@ class ConversationPromptMessage extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Text(
-              prompt.prompt,
+              this.message.conversationPrompt.prompt,
               style: TextStyle(color: Colors.white, fontSize: 24.0),
               textAlign: TextAlign.center,
             ),
@@ -78,11 +78,23 @@ class ConversationPromptMessage extends StatelessWidget {
               children: <Widget>[
                 // todo: this should really be the *other* person's photo URL, not the chat URL
                 // todo: chat.id is wrong -- it needs to be the other participant ID
-                buildUserIcon(chat.photoURL,
-                    prompt.responses?.containsKey(chat.id) ?? false),
+                buildUserIcon(
+                    chat.photoURL,
+                    this
+                            .message
+                            .conversationPrompt
+                            .responses
+                            ?.containsKey(chat.id) ??
+                        false),
                 SizedBox(width: 12.0),
-                buildUserIcon(userData.photoURL,
-                    prompt.responses?.containsKey(userData.id) ?? false),
+                buildUserIcon(
+                    userData.photoURL,
+                    this
+                            .message
+                            .conversationPrompt
+                            .responses
+                            ?.containsKey(userData.id) ??
+                        false),
               ],
             )
           ],

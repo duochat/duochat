@@ -163,6 +163,7 @@ class ChatMessageReadByUser {
 }
 
 class ChatMessage {
+  final String id;
   final ChatMessageUser sender;
   final String text;
   final String imageURL;
@@ -171,14 +172,17 @@ class ChatMessage {
   final List<ChatMessageReadByUser> readBy;
 
   ChatMessage(
-      {this.sender,
+      {this.id,
+      this.sender,
       this.text,
       this.imageURL,
       this.conversationPrompt,
       this.timestamp,
       this.readBy});
-  factory ChatMessage.fromMap(Map data) {
+  factory ChatMessage.fromMapEntry(MapEntry<dynamic, dynamic> entry) {
+    Map data = entry.value;
     return ChatMessage(
+      id: entry.key,
       sender: ChatMessageUser.fromMap(data['sender']),
       text: data['text'],
       imageURL: data['imageURL'],
@@ -209,9 +213,10 @@ class ConversationPrompt {
 
   ConversationPrompt({this.prompt, this.responses});
 
-  factory ConversationPrompt.fromMap(Map data) {
+  factory ConversationPrompt.fromMap(Map<dynamic, dynamic> data) {
     return ConversationPrompt(
-        prompt: data['prompt'], responses: data['responses']);
+        prompt: data['prompt'],
+        responses: data['responses']?.cast<String, String>());
   }
   toMap() {
     return {

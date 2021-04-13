@@ -47,9 +47,9 @@ class ChatList extends StatelessWidget {
                   if (snapshot.hasData) {
                     List<ChatMessage> messages =
                         (snapshot.data.snapshot.value ?? {})
-                            .values
+                            .entries
                             .map<ChatMessage>(
-                                (message) => ChatMessage.fromMap(message))
+                                (entry) => ChatMessage.fromMapEntry(entry))
                             .toList();
                     messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
                     if (messages.isEmpty) {
@@ -80,7 +80,7 @@ class ChatList extends StatelessWidget {
                     message: text + (time != "" ? " · " + time : ""),
                     onTap: () => Navigator.pushNamed(
                       context,
-                      ChatScreen.routeId,
+                      ChatScreen.id,
                       arguments: ChatScreenArguments(chat),
                     ),
                     contextWidget: Column(
