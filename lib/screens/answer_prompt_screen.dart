@@ -3,6 +3,7 @@ import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 class AnswerPromptScreenArguments {
@@ -21,6 +22,23 @@ class AnswerPromptScreen extends StatefulWidget {
 
 class _AnswerPromptScreenState extends State<AnswerPromptScreen> {
   final myController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      final AnswerPromptScreenArguments args =
+          ModalRoute.of(context).settings.arguments;
+      ConversationPrompt prompt = args.message.conversationPrompt;
+      final PublicUserData user =
+          Provider.of<PublicUserData>(context, listen: false);
+
+      if (prompt.responses?.containsKey(user.id) == true) {
+        myController.text = prompt.responses[user.id];
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
