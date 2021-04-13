@@ -16,7 +16,6 @@ class ChatMessages extends StatefulWidget {
 
 class _ChatMessagesState extends State<ChatMessages> {
   final ScrollController _scrollController = ScrollController();
-  final _scrollMessageCt = 0;
 
   @override
   Widget build(BuildContext context) {

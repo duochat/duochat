@@ -35,7 +35,7 @@ class ChatList extends StatelessWidget {
                   String time = "";
                   bool isNew = false;
 
-                  String getSenderName(ChatMessageSender sender) {
+                  String getSenderName(ChatMessageUser sender) {
                     bool isCurrentUser =
                         sender.id == FirebaseAuth.instance.currentUser.uid;
                     if (isCurrentUser) {
@@ -63,8 +63,11 @@ class ChatList extends StatelessWidget {
                       } else if (messages.last.imageURL != null) {
                         text =
                             '[${getSenderName(messages.last.sender)} sent an image]';
+                      } else if (messages.last.conversationPrompt != null) {
+                        text =
+                            'Prompt: ${messages.last.conversationPrompt.prompt}';
                       } else {
-                        text = 'Say hi to ${chat.name}!';
+                        text = 'Error, unknown chat message type';
                       }
                     }
                   }
@@ -77,7 +80,7 @@ class ChatList extends StatelessWidget {
                     message: text + (time != "" ? " · " + time : ""),
                     onTap: () => Navigator.pushNamed(
                       context,
-                      ChatScreen.id,
+                      ChatScreen.routeId,
                       arguments: ChatScreenArguments(chat),
                     ),
                     contextWidget: Column(

@@ -1,14 +1,55 @@
 import 'package:duochat/models.dart';
 import 'package:duochat/screens/answer_prompt_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ConversationPromptMessage extends StatelessWidget {
   final ConversationPrompt prompt;
 
   const ConversationPromptMessage({this.prompt});
 
+  Widget buildUserIcon(String photoURL, bool answeredPrompt) {
+    return Container(
+      child: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          CircleAvatar(
+            backgroundImage: NetworkImage(photoURL),
+          ),
+          if (answeredPrompt)
+            Container(
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(9, 175, 26, 0.61),
+                shape: BoxShape.circle,
+              ),
+            ),
+          if (answeredPrompt)
+            Icon(
+              Icons.check,
+              color: Colors.white,
+            ),
+        ],
+      ),
+      width: 56.0,
+      height: 56.0,
+      padding: EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    PublicUserData userData =
+        Provider.of<PublicUserData>(context, listen: false);
+    Chat chat = Provider.of<Chat>(context, listen: false);
+
+    if (chat == null) {
+      throw "ConversationPromptMessage must be used within a Chat provider";
+    }
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
@@ -35,48 +76,13 @@ class ConversationPromptMessage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Container(
-                  child: CircleAvatar(
-                    backgroundImage:
-                        NetworkImage('https://picsum.photos/200/200'),
-                  ),
-                  width: 56.0,
-                  height: 56.0,
-                  padding: EdgeInsets.all(3.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                ),
+                // todo: this should really be the *other* person's photo URL, not the chat URL
+                // todo: chat.id is wrong -- it needs to be the other participant ID
+                buildUserIcon(chat.photoURL,
+                    prompt.responses?.containsKey(chat.id) ?? false),
                 SizedBox(width: 12.0),
-                Container(
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: <Widget>[
-                      CircleAvatar(
-                        backgroundImage:
-                            NetworkImage('https://picsum.photos/200/200'),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(9, 175, 26, 0.61),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      Icon(
-                        Icons.check,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                  width: 56.0,
-                  height: 56.0,
-                  padding: EdgeInsets.all(3.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                ),
+                buildUserIcon(userData.photoURL,
+                    prompt.responses?.containsKey(userData.id) ?? false),
               ],
             )
           ],

@@ -115,25 +115,27 @@ class Chat {
   final String name;
   final String id;
   final String photoURL;
+  final List<ChatMessageUser> participants;
 
-  Chat({this.name, this.id, this.photoURL});
+  Chat({this.name, this.id, this.photoURL, this.participants});
   factory Chat.fromMap(Map data) {
     return Chat(
       name: data['name'] ?? '',
       photoURL: data['photoURL'] ?? '',
       id: data['id'] ?? '',
+      participants: data['participants'] ?? [],
     );
   }
 }
 
-class ChatMessageSender {
+class ChatMessageUser {
   final String name;
   final String photoURL;
   final String id;
 
-  ChatMessageSender({this.name, this.photoURL, this.id});
-  factory ChatMessageSender.fromMap(Map data) {
-    return ChatMessageSender(
+  ChatMessageUser({this.name, this.photoURL, this.id});
+  factory ChatMessageUser.fromMap(Map data) {
+    return ChatMessageUser(
       name: data['name'] ?? '',
       photoURL: data['photoURL'] ?? '',
       id: data['id'] ?? '',
@@ -161,7 +163,7 @@ class ChatMessageReadByUser {
 }
 
 class ChatMessage {
-  final ChatMessageSender sender;
+  final ChatMessageUser sender;
   final String text;
   final String imageURL;
   final ConversationPrompt conversationPrompt;
@@ -177,7 +179,7 @@ class ChatMessage {
       this.readBy});
   factory ChatMessage.fromMap(Map data) {
     return ChatMessage(
-      sender: ChatMessageSender.fromMap(data['sender']),
+      sender: ChatMessageUser.fromMap(data['sender']),
       text: data['text'],
       imageURL: data['imageURL'],
       conversationPrompt: data['conversationPrompt'] == null
@@ -194,7 +196,7 @@ class ChatMessage {
       "sender": sender.toMap(),
       "text": text,
       "imageURL": imageURL,
-      "conversationPrompt": conversationPrompt.toMap(),
+      "conversationPrompt": conversationPrompt?.toMap(),
       "timestamp": timestamp.millisecondsSinceEpoch,
       "readBy": readBy.map((el) => el.toMap()).toList()
     };

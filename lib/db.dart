@@ -20,13 +20,15 @@ class DatabaseService {
   }
 
   /// Make a connection request to a user
-  static Future<void> requestConnection(BuildContext context, String userID) async {
-    User firebaseUser = Provider.of<User>(context, listen: false);
-    PrivateUserData sender = await PrivateUserData.fromID(firebaseUser.uid);
+  static Future<void> requestConnection(
+      BuildContext context, String userID) async {
+    PublicUserData currentUser =
+        Provider.of<PublicUserData>(context, listen: false);
+    PrivateUserData sender = await PrivateUserData.fromID(currentUser.id);
     sender.outgoingRequests.add(userID);
     await sender.writeToDB();
     PrivateUserData receiver = await PrivateUserData.fromID(userID);
-    receiver.incomingRequests.add(firebaseUser.uid);
+    receiver.incomingRequests.add(currentUser.id);
     await receiver.writeToDB();
   }
 
@@ -65,7 +67,8 @@ class DatabaseService {
   }
 
   /// Remove a connection with another user
-  static Future<void> removeConnection(BuildContext context, String userID) async {
+  static Future<void> removeConnection(
+      BuildContext context, String userID) async {
     User firebaseUser = Provider.of<User>(context, listen: false);
     PublicUserData me = await PublicUserData.fromID(firebaseUser.uid);
     me.connections.remove(userID);

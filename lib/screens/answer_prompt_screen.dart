@@ -2,6 +2,7 @@ import 'package:duochat/models.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AnswerPromptScreenArguments {
   final ConversationPrompt prompt;
@@ -22,6 +23,7 @@ class _AnswerPromptScreenState extends State<AnswerPromptScreen> {
     final AnswerPromptScreenArguments args =
         ModalRoute.of(context).settings.arguments;
 
+    Chat chat = Provider.of<Chat>(context, listen: false);
     ConversationPrompt prompt = args.prompt;
 
     return Scaffold(
@@ -30,8 +32,8 @@ class _AnswerPromptScreenState extends State<AnswerPromptScreen> {
         child: Column(
           children: <Widget>[
             TopNavBar(
-              image: NetworkImage('https://picsum.photos/200'),
-              title: 'Ian Chen',
+              image: NetworkImage(chat.photoURL),
+              title: chat.name,
               suffix: CupertinoButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -98,9 +100,7 @@ class _AnswerPromptScreenState extends State<AnswerPromptScreen> {
               child: CupertinoButton(
                 child: Text('Send'),
                 color: Theme.of(context).primaryColor,
-                onPressed: () {
-                  print("Sending");
-                },
+                onPressed: handlePromptAnswer,
                 borderRadius: BorderRadius.all(Radius.circular(1000.0)),
               ),
             ),
@@ -109,4 +109,6 @@ class _AnswerPromptScreenState extends State<AnswerPromptScreen> {
       ),
     );
   }
+
+  void handlePromptAnswer() {}
 }

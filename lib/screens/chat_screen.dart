@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:duochat/main.dart';
 import 'package:duochat/widget/chat_messages.dart';
 import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,7 +23,8 @@ class ChatScreenArguments {
 }
 
 class ChatScreen extends StatefulWidget {
-  static String id = 'chat_screen';
+  static const String id = 'chat_screen';
+  static const String routeId = '${chatRoutePrefix}chat_screen';
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -74,7 +76,7 @@ class _ChatScreenState extends State<ChatScreen> {
       PublicUserData.fromID(FirebaseAuth.instance.currentUser.uid)
           .then((PublicUserData currentUser) {
         ChatMessage message = ChatMessage(
-          sender: ChatMessageSender(
+          sender: ChatMessageUser(
             name: currentUser.name,
             id: currentUser.id,
             photoURL: currentUser.photoURL,
@@ -133,7 +135,7 @@ class _ChatScreenState extends State<ChatScreen> {
       // temporary handling
 
       ChatMessage message = ChatMessage(
-        sender: ChatMessageSender(
+        sender: ChatMessageUser(
           name: currentUser.name,
           id: currentUser.id,
           photoURL: currentUser.photoURL,
@@ -157,7 +159,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     ChatMessage message = ChatMessage(
-      sender: ChatMessageSender(
+      sender: ChatMessageUser(
         name: currentUser.name,
         id: currentUser.id,
         photoURL: currentUser.photoURL,
@@ -179,8 +181,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ChatScreenArguments args = ModalRoute.of(context).settings.arguments;
-    final chatId = args.chat.id;
+    final Chat chat = Provider.of<Chat>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -188,8 +189,8 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: <Widget>[
             TopNavBar(
-              image: NetworkImage(args.chat.photoURL),
-              title: args.chat.name,
+              image: NetworkImage(chat.photoURL),
+              title: chat.name,
               suffix: CupertinoButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -220,7 +221,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 stream: FirebaseDatabase.instance
                     .reference()
                     .child('chats')
-                    .child(chatId)
+                    .child(chat.id)
                     .child("messages")
                     .onValue,
                 builder: (context, snapshot) {
@@ -264,7 +265,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       print("Send Image");
                       await chooseFile();
                       print("chosen");
-                      await uploadFile(chatId);
+                      await uploadFile(chat.id);
                       print("upload");
                     },
                     padding: EdgeInsets.all(8.0),
@@ -287,7 +288,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       textInputAction: TextInputAction.send,
                       onSubmitted: (result) {
-                        handleChatMessageSubmit(chatId);
+                        handleChatMessageSubmit(chat.id);
                       },
                     ),
                   ),
@@ -297,7 +298,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.all(Radius.circular(100.0)),
                     onPressed: () {
-                      handleChatMessageSubmit(chatId);
+                      handleChatMessageSubmit(chat.id);
                     },
                     padding: EdgeInsets.all(8.0),
                     minSize: 34.0,
