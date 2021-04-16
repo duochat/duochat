@@ -139,7 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
           photoURL: currentUser.photoURL,
         ),
         conversationPrompt: ConversationPrompt(
-          prompt: "What's your most memorable memory?",
+          prompt: "What's your favorite FBLA event?",
         ),
         timestamp: DateTime.now(),
         readBy: [ChatMessageReadByUser(name: "dfas", id: "sadf")],
