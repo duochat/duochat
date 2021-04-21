@@ -20,30 +20,32 @@ class TopNavBar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
         children: <Widget>[
-          image == null ? SizedBox(width: 0) :
-          hasImageBorder ? Container(
-            child: CircleAvatar(
-              backgroundImage: image,
-            ),
-            width: 50.0,
-            height: 50.0,
-            padding: EdgeInsets.all(3.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8.0,
-                )
-              ],
-            ),
-          ) :
-          Image(
-            image: image,
-            width: 50.0,
-            height: 50.0,
-          ),
+          image == null
+              ? SizedBox(width: 0)
+              : hasImageBorder
+                  ? Container(
+                      child: CircleAvatar(
+                        backgroundImage: image,
+                      ),
+                      width: 50.0,
+                      height: 50.0,
+                      padding: EdgeInsets.all(3.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8.0,
+                          )
+                        ],
+                      ),
+                    )
+                  : Image(
+                      image: image,
+                      width: 50.0,
+                      height: 50.0,
+                    ),
           SizedBox(width: 10),
           Expanded(
             child: SingleChildScrollView(
@@ -58,7 +60,7 @@ class TopNavBar extends StatelessWidget {
               ),
             ),
           ),
-          suffix,
+          if (suffix != null) suffix,
         ],
       ),
     );
@@ -66,7 +68,6 @@ class TopNavBar extends StatelessWidget {
 }
 
 class TopSearchBar extends StatelessWidget {
-
   final String hint;
   final Widget suffix;
   final Function(String value) onChanged;
@@ -93,7 +94,8 @@ class TopSearchBar extends StatelessWidget {
               autofocus: true,
               autocorrect: false,
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(100.0)),
                 ),
@@ -108,5 +110,4 @@ class TopSearchBar extends StatelessWidget {
       ),
     );
   }
-
 }

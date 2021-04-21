@@ -69,8 +69,8 @@ class MyApp extends StatelessWidget {
               // Notice that the counter didn't reset back to zero; the application
               // is not restarted.
 //          primarySwatch: MaterialColor(0xFFFF7A00),
-              backgroundColor: Colors.white,
-              canvasColor: Colors.white,
+              backgroundColor: Color(0xffFCF4E6),
+              canvasColor: Color(0xffFCF4E6),
               primaryColor: Color(0xFFFF7A00),
               textButtonTheme: TextButtonThemeData(
                   style: TextButton.styleFrom(

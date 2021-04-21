@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:duochat/widget/chat_messages.dart';
-import 'package:duochat/widget/top_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_database/firebase_database.dart';
@@ -185,23 +184,22 @@ class _ChatScreenState extends State<ChatScreen> {
     return MultiProvider(
       providers: [Provider(create: (_) => args.chat)],
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: SafeArea(
           child: Column(
             children: <Widget>[
-              TopNavBar(
-                image: NetworkImage(args.chat.photoURL),
-                title: args.chat.name,
-                suffix: CupertinoButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 6.0),
                   child: Row(
                     children: <Widget>[
                       Icon(
                         Icons.arrow_back,
-                        size: 18.0,
-                        color: Theme.of(context).primaryColor,
+                        size: 14.0,
+                        color: Colors.grey[500],
                       ),
                       SizedBox(
                         width: 4.0,
@@ -209,8 +207,102 @@ class _ChatScreenState extends State<ChatScreen> {
                       Text(
                         'Back',
                         style: TextStyle(
-                          fontSize: 18.0,
-                          color: Theme.of(context).primaryColor,
+                          fontSize: 14.0,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 12.0),
+                padding: EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  color: Color(0xff227C9D),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 8.0,
+                    ),
+                  ],
+                ),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Container(
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(args.chat.photoURL),
+                        ),
+                        width: 50.0,
+                        height: 50.0,
+                        padding: EdgeInsets.all(1.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 12.0,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            args.chat.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 24.0,
+                            ),
+                          ),
+                          SizedBox(height: 2.0),
+                          Text(
+                            'Level 9 | Question Streak: 4',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Expanded(child: Container()),
+                      GestureDetector(
+                        onTap: () {
+                          print("Show today's question");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Color(0xffFE6D73),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(2.0)),
+                          ),
+                          padding: EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Today's\nQuestion",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.0,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 2.0),
+                              Text(
+                                "Now Viewing",
+                                style: TextStyle(
+                                  fontSize: 10.0,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ],

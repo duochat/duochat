@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xffFCF4E6),
       body: SafeArea(
         child: Column(
           children: <Widget>[
