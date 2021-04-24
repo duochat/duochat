@@ -44,13 +44,14 @@ class DatabaseService {
 
   /// Accept an incoming connection request
   static Future<void> acceptRequest(BuildContext context, String userID) async {
-    User firebaseUser = Provider.of<User>(context, listen: false);
-    await _removeRequest(userID, firebaseUser.uid);
-    PublicUserData me = await PublicUserData.fromID(firebaseUser.uid);
+    PublicUserData currentUser =
+        Provider.of<PublicUserData>(context, listen: false);
+    await _removeRequest(userID, currentUser.id);
+    PublicUserData me = await PublicUserData.fromID(currentUser.id);
     me.connections.add(userID);
     await me.writeToDB();
     PublicUserData user = await PublicUserData.fromID(userID);
-    user.connections.add(firebaseUser.uid);
+    user.connections.add(currentUser.id);
     await user.writeToDB();
   }
 

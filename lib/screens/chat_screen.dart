@@ -278,7 +278,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           decoration: BoxDecoration(
                             color: Color(0xffFE6D73),
                             borderRadius:
-                                BorderRadius.all(Radius.circular(2.0)),
+                                BorderRadius.all(Radius.circular(4.0)),
                           ),
                           padding: EdgeInsets.all(8.0),
                           child: Column(
@@ -373,11 +373,10 @@ class _ChatScreenState extends State<ChatScreen> {
                             vertical: 10.0, horizontal: 12.0),
                         placeholder: "Message here...",
                         decoration: BoxDecoration(
-                          color: Color(0xFFF6F6F6),
+                          color: Color(0xFFE8E8E8),
                           borderRadius: BorderRadius.all(
                             Radius.circular(100.0),
                           ),
-                          border: Border.all(color: Color(0xFFE8E8E8)),
                         ),
                         textInputAction: TextInputAction.send,
                         onSubmitted: (result) {

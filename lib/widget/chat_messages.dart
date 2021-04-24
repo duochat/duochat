@@ -81,7 +81,7 @@ class _ChatMessagesState extends State<ChatMessages> {
                           decoration: BoxDecoration(
                             color: isUser
                                 ? Theme.of(context).primaryColor
-                                : Colors.grey[100],
+                                : Colors.white,
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10.0)),
                           ),

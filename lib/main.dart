@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
 //          primarySwatch: MaterialColor(0xFFFF7A00),
               backgroundColor: Color(0xffFCF4E6),
               canvasColor: Color(0xffFCF4E6),
-              primaryColor: Color(0xFFFF7A00),
+              primaryColor: Color(0xFF0BCAB7),
               textButtonTheme: TextButtonThemeData(
                   style: TextButton.styleFrom(
                 primary: Colors.white,

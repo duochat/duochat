@@ -93,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
+      await _googleSignIn.disconnect();
       GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
